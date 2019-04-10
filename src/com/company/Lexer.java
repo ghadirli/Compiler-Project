@@ -15,9 +15,10 @@ public class Lexer {
 
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
-    }//
+        preProcess();
+    }
 
-    static void preProcess(){
+    private void preProcess(){
         String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
         try {
             addContentToList(keywordsList, tokenTypesDirectory + "\\KEYWORDS.txt");
@@ -27,8 +28,8 @@ public class Lexer {
         }
     }
 
-    private static void addContentToList(List<String> list, String directory) throws FileNotFoundException {
-        FileInputStream inKeywords = new FileInputStream(directory);
+    private static void addContentToList(List<String> list, String fileName) throws FileNotFoundException {
+        FileInputStream inKeywords = new FileInputStream(fileName);
         Scanner scanner = new Scanner(inKeywords);
         while(scanner.hasNext())
             keywordsList.add(scanner.next());
