@@ -15,7 +15,7 @@ public class Lexer {
 
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
-    }
+    }//
 
     static void preProcess(){
         String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
