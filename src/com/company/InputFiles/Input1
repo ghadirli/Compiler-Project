@@ -1,6 +1,6 @@
 void main(void){
-    int a = 0;
-    // comment 2
+	int a = 0;
+	// comment 2
     a = 2 + +2;
     a = a + -3;
     cde = a;

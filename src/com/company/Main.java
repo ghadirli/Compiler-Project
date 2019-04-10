@@ -3,8 +3,9 @@ package com.company;
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
-
+        String sampleInputDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles";
+        Lexer lexer = new Lexer(sampleInputDirectory + "\\Input1");
+        //lexer.analyze();
     }
 
     //public static tok
