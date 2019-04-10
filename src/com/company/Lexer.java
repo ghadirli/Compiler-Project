@@ -4,5 +4,5 @@ import java.io.File;
 
 public class Lexer {
 
-    
+
 }
