@@ -37,6 +37,7 @@ public class Lexer {
 
     }
 
-
-
+    public Lexer(String inputFilePath) {
+        this.inputFilePath = inputFilePath;
+    }
 }
