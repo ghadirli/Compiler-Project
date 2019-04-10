@@ -12,10 +12,13 @@ import java.io.*;
 public class Lexer {
     private static ArrayList<String> keywordsList = new ArrayList<>();
     private static ArrayList<String> symbolsList = new ArrayList<>();
+    private String input;
+    private String inputFilePath;
 
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
-    }//
+        this.input = readInputFromFile(inputFilePath);
+    }
 
     static void preProcess(){
         String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
@@ -41,8 +44,7 @@ public class Lexer {
     public static ArrayList<String> getSymbolsList() {
         return symbolsList;
     }
-    private String input;
-    private String inputFilePath;
+
 
     public String readInputFromFile(String fileName) {
         InputStream is = null;
