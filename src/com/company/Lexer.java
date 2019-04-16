@@ -1,6 +1,7 @@
 package com.company;
 
 import javafx.util.Pair;
+import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,28 +20,53 @@ public class Lexer {
     private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
     private String inputFilePath;
-    private int lineNumber;
+    private int lineNumber = 0;
     private final int ERRORSTATE = 2999;
     private final int numberOfStates = 15;
     private final int initialNumber = -1;
     private final int STARTSTATE = 0;
+    private String outputFilePath;
+//    private HashMap<Integer, String>
 
 
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
-        this.input = readInputFromFile(inputFilePath);
+        this.outputFilePath =
+                this.input = readInputFromFile(inputFilePath);
         System.out.println(input);
         preProcess();
     }//
 
-    private void analyzer(){
+    public void analyzer() {
+        Token currentToken = new Token();
+        Integer curser = 0;
+        Integer lineNumber = 0;
+        int size = input.length();
+        while (curser < size) {
+            Pair<Token, Integer> tokenPair = getNextToken(curser);
+            System.out.println(tokenPair.getValue());
+            curser = tokenPair.getValue();
+            System.out.println("line number is " + countLines(input.substring(0, curser)) + " description is " +
+                    tokenPair.getKey().getDescription() + " and token is " + tokenPair.getKey().getTokenType());
+//            writeInFile(countLines(input.substring(0, curser)), tokenPair.getKey());
+        }
 
     }
+
+    private void writeInFile(Integer lineNo, Token string) {
+
+    }
+
+    private static int countLines(String str) {
+        String[] lines = str.split("\r\n|\r|\n");
+        return lines.length;
+    }
+
     private Pair<Token, Integer> getNextToken(int startIndex) {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
-        while(acceptStates.get(curState) != null) { //TODO check correct?
+        while (acceptStates.get(curState) != null) { //TODO check correct?
             curState = getNextState(curState, input.charAt(curIndex));
             curIndex++;
         }
@@ -52,17 +78,18 @@ public class Lexer {
 
 
     private void preProcess() {
-        String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
+        String tokenTypesDirectory = System.getProperty("user.dir") + "/src/com/company/InputFiles/Token Types";
         try {
             initializeAcceptedStates();
             initializeTransitionMatrix();
-            addContentToList(keywordsList, tokenTypesDirectory + "\\KEYWORDS.txt");
-            addContentToList(symbolsList, tokenTypesDirectory + "\\SYMBOLS.txt");
+            addContentToList(keywordsList, tokenTypesDirectory + "/KEYWORDS.txt");
+            addContentToList(symbolsList, tokenTypesDirectory + "/SYMBOLS.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         constructTransitionMatrix();
     }
+
     private void initializeTransitionMatrix() {
         for (int i = 0; i < numberOfStates; i++) {
             transitionMatrix.add(new ArrayList<>());
@@ -71,6 +98,7 @@ public class Lexer {
             }
         }
     }
+
     private void constructTransitionMatrix() {
 
         transitionMatrix.get(0).set(CharacterTypes.WHITESPACE.ordinal(), 0);
@@ -144,9 +172,8 @@ public class Lexer {
     }
 
     private int getNextState(int curState, char seenCharacter) {
-        //TODO
-
-        return 0;
+        CharacterTypes charType = checkCharacterTypes(seenCharacter);
+        return transitionMatrix.get(curState).get(charType.ordinal());
     }
 
     private CharacterTypes checkCharacterTypes(char x) {

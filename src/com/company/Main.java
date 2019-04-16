@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company/InputFiles";
         Lexer lexer = new Lexer(sampleInputDirectory + "/Input1");
-        //lexer.analyze();
+        lexer.analyzer();
     }
 
     //public static tok
