@@ -28,7 +28,7 @@ public class Lexer {
 
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
-        this.input = readInputFromFile(inputFilePath);
+        this.input = readInputFromFile(inputFilePath) + '\n';
         System.out.println(input);
         preProcess();
     }//
@@ -36,18 +36,28 @@ public class Lexer {
     private void analyzer(){
 
     }
-    private Pair<Token, Integer> getNextToken(int startIndex) {
+
+    private Pair<Token, Integer> getNextToken(String input, int startIndex) {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
         while(acceptStates.get(curState) != null) { //TODO check correct?
-            curState = getNextState(curState, input.charAt(curIndex));
+            curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
             curIndex++;
         }
         res.setDescription(input.substring(startIndex, curIndex)); // TODO handle cases which must go back one index
         res.setTokenType(acceptStates.get(curState));
+
+        //handle of id or keyword
+        if(acceptStates.get(curState) == TokenTypes.ID) {
+            for(String keyword : keywordsList){
+                if(res.getDescription().equals(keyword)) {
+                    res.setTokenType(TokenTypes.KEYWORD);
+                }
+            }
+        }
+
         return new Pair<>(res, curIndex);
-        //TODO
     }
 
 
@@ -144,9 +154,8 @@ public class Lexer {
     }
 
     private int getNextState(int curState, char seenCharacter) {
-        //TODO
-
-        return 0;
+        CharacterTypes characterType = checkCharacterTypes(seenCharacter);
+        return transitionMatrix.get(curState).get(characterType.ordinal());
     }
 
     private CharacterTypes checkCharacterTypes(char x) {
@@ -176,15 +185,6 @@ public class Lexer {
         while (scanner.hasNext())
             list.add(scanner.next());
     }
-
-    public ArrayList<String> getKeywordsList() {
-        return keywordsList;
-    }
-
-    public ArrayList<String> getSymbolsList() {
-        return symbolsList;
-    }
-
 
     public String readInputFromFile(String fileName) {
         InputStream is = null;
@@ -224,4 +224,12 @@ public class Lexer {
         acceptStates.put(16, TokenTypes.COMMENT);
     }
 
+    //-------------getter and setter------------------------
+    public ArrayList<String> getKeywordsList() {
+        return keywordsList;
+    }
+
+    public ArrayList<String> getSymbolsList() {
+        return symbolsList;
+    }
 }
