@@ -89,13 +89,27 @@ public class Lexer {
         transitionMatrix.get(2).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.WHITESPACE.ordinal(), ERRORSTATE);
-        transitionMatrix.get(2).set(CharacterTypes.)
+        transitionMatrix.get(2).set(CharacterTypes.SYMBOL.ordinal(), ERRORSTATE);
 
         transitionMatrix.get(3).set(CharacterTypes.EQUAL.ordinal(), 14);
+        transitionMatrix.get(3).set(CharacterTypes.WHITESPACE.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.DIGIT.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.ALPHABET.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.SYMBOL.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.SLASH.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.STAR.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.ENTER.ordinal(), 15);
 
-
+        for (int i = 0; i < CharacterTypes.values().length; i++) {
+            transitionMatrix.get(4).set(i,ERRORSTATE);
+        }
         transitionMatrix.get(4).set(CharacterTypes.SLASH.ordinal(), 5);
         transitionMatrix.get(4).set(CharacterTypes.STAR.ordinal(), 6);
+
+        for (int i = 0; i < CharacterTypes.values().length; i++) {
+            transitionMatrix.get(5).set(i, 5);
+        }
+        transitionMatrix.get(5).set(CharacterTypes.ENTER.ordinal(), 16);
 
         transitionMatrix.get(6).set(CharacterTypes.STAR.ordinal(), 7);
         transitionMatrix.get(6).set(CharacterTypes.EQUAL.ordinal(), 6);
@@ -106,6 +120,9 @@ public class Lexer {
         transitionMatrix.get(6).set(CharacterTypes.SLASH.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.WHITESPACE.ordinal(), 6);
 
+        for (int i = 0; i < CharacterTypes.values().length; i++) {
+            transitionMatrix.get(7).set(i, 6);
+        }
         transitionMatrix.get(7).set(CharacterTypes.SLASH.ordinal(), 16);
 
 
