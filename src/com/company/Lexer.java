@@ -7,13 +7,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.io.*;
+import com.company.TokenTypes;
+
+
 
 public class Lexer {
-    private static ArrayList<String> keywordsList = new ArrayList<>();
-    private static ArrayList<String> symbolsList = new ArrayList<>();
+    private ArrayList<String> keywordsList = new ArrayList<>();
+    private ArrayList<String> symbolsList = new ArrayList<>();
+    private ArrayList<ArrayList<Integer>> transitionMatrix = new ArrayList<>();
+    private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
     private String inputFilePath;
     private int lineNumber;
@@ -26,7 +32,21 @@ public class Lexer {
     }//
 
     private void getToNextToken() {
+        //TODO
+    }
 
+    private void initializeAcceptedStates(){
+        acceptStates.put(8, TokenTypes.ERROR);
+        acceptStates.put(9, TokenTypes.ERROR);
+        acceptStates.put(10, TokenTypes.ID); //TODO must check for symbols
+        acceptStates.put(11, TokenTypes.ERROR);
+        acceptStates.put(12, TokenTypes.NUM);
+        acceptStates.put(13, TokenTypes.SYMBOL);
+        acceptStates.put(14, TokenTypes.SYMBOL);
+        acceptStates.put(15, TokenTypes.SYMBOL);
+        acceptStates.put(16, TokenTypes.COMMENT);
+        acceptStates.put(17, TokenTypes.COMMENT);
+        acceptStates.put(18, TokenTypes.ERROR);
     }
 
     private void preProcess() {
@@ -41,7 +61,16 @@ public class Lexer {
     }
 
     private void constructTransitionMatrix() {
+        final int numberOfStates = 10;
+        for(int i=0; i<numberOfStates; i++) {
+            transitionMatrix.add(new ArrayList<>());
+        }
+        transitionMatrix.get(0).set(CharacterTypes.WHITESPACE.ordinal(), 0);
 
+    }
+
+    private int getNextState(int curState, char seenCharacter){
+        //TODO
     }
 
     private CharacterTypes checkCharacterTypes(char x) {
