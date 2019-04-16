@@ -1,8 +1,7 @@
 package com.company;
 
-import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
+import javafx.util.Pair;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,12 +11,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.io.*;
 
-import com.company.TokenTypes;
-
 
 public class Lexer {
-    private static ArrayList<String> keywordsList = new ArrayList<>();
-    private static ArrayList<String> symbolsList = new ArrayList<>();
+    private ArrayList<String> keywordsList = new ArrayList<>();
+    private ArrayList<String> symbolsList = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> transitionMatrix = new ArrayList<>();
     private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
@@ -26,6 +23,7 @@ public class Lexer {
     private final int ERRORSTATE = 2999;
     private final int numberOfStates = 15;
     private final int initialNumber = -1;
+    private final int STARTSTATE = 0;
 
 
     public Lexer(String inputFilePath) {
@@ -34,8 +32,17 @@ public class Lexer {
         preProcess();
     }//
 
-    private void getToNextToken() {
-
+    private Pair<Token, Integer> getNextToken(int startIndex) {
+        Token res = new Token();
+        int curState = STARTSTATE;
+        int curIndex = startIndex;
+        while(acceptStates.get(curState) != null) { //TODO check correct?
+            curState = getNextState(curState, input.charAt(curIndex));
+            curIndex++;
+        }
+        res.setDescription(input.substring(startIndex, curIndex)); // TODO handle cases which must go back one index
+        res.setTokenType(acceptStates.get(curState));
+        return new Pair<>(res, curIndex);
         //TODO
     }
 
@@ -45,14 +52,13 @@ public class Lexer {
         try {
             initializeAcceptedStates();
             initializeTransitionMatrix();
-            constructTransitionMatrix();
             addContentToList(keywordsList, tokenTypesDirectory + "\\KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "\\SYMBOLS.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        constructTransitionMatrix();
     }
-
     private void initializeTransitionMatrix() {
         for (int i = 0; i < numberOfStates; i++) {
             transitionMatrix.add(new ArrayList<>());
@@ -61,7 +67,6 @@ public class Lexer {
             }
         }
     }
-
     private void constructTransitionMatrix() {
 
         transitionMatrix.get(0).set(CharacterTypes.WHITESPACE.ordinal(), 0);
@@ -160,14 +165,14 @@ public class Lexer {
         FileInputStream inKeywords = new FileInputStream(fileName);
         Scanner scanner = new Scanner(inKeywords);
         while (scanner.hasNext())
-            keywordsList.add(scanner.next());
+            list.add(scanner.next());
     }
 
-    public static ArrayList<String> getKeywordsList() {
+    public ArrayList<String> getKeywordsList() {
         return keywordsList;
     }
 
-    public static ArrayList<String> getSymbolsList() {
+    public ArrayList<String> getSymbolsList() {
         return symbolsList;
     }
 
