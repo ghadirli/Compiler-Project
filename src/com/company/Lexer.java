@@ -15,6 +15,7 @@ import java.io.*;
 public class Lexer {
     private ArrayList<String> keywordsList = new ArrayList<>();
     private ArrayList<String> symbolsList = new ArrayList<>();
+    private ArrayList<Character> whiteSpaceList = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> transitionMatrix = new ArrayList<>();
     private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
@@ -78,11 +79,11 @@ public class Lexer {
         TokenTypes tokenType = acceptStates.get(curState);
 
         //handle of cases which must go back one index
-        if(tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
+        if (tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
             curIndex--;
         }
         if(tokenType == TokenTypes.SYMBOL){
-            if(curIndex>1 && input.charAt(curIndex-1) != '=' && input.charAt(curIndex-2) == '='){
+            if(input.charAt(curIndex-1) != '='){
                 curIndex--;
             }
         }
