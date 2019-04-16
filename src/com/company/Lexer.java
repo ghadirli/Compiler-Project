@@ -72,7 +72,7 @@ public class Lexer {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
-        while(acceptStates.get(curState) == null) { //TODO check correct?
+        while (acceptStates.get(curState) == null) { //TODO check correct?
             curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
             curIndex++;
         }
@@ -82,8 +82,8 @@ public class Lexer {
         if (tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
             curIndex--;
         }
-        if(tokenType == TokenTypes.SYMBOL){
-            if(input.charAt(curIndex-1) != '='){
+        if (tokenType == TokenTypes.SYMBOL) {
+            if (input.charAt(curIndex - 1) != '=') {
                 curIndex--;
             }
         }
@@ -92,9 +92,9 @@ public class Lexer {
         res.setTokenType(tokenType);
 
         //handle of id or keyword
-        if(acceptStates.get(curState) == TokenTypes.ID) {
-            for(String keyword : keywordsList){
-                if(res.getDescription().equals(keyword)) {
+        if (acceptStates.get(curState) == TokenTypes.ID) {
+            for (String keyword : keywordsList) {
+                if (res.getDescription().equals(keyword)) {
                     res.setTokenType(TokenTypes.KEYWORD);
                 }
             }
@@ -111,6 +111,7 @@ public class Lexer {
             initializeTransitionMatrix();
             addContentToList(keywordsList, tokenTypesDirectory + "/KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "/SYMBOLS.txt");
+            addContentToList();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -222,6 +223,13 @@ public class Lexer {
             return CharacterTypes.SYMBOL;
         } else return CharacterTypes.OTHER;
 
+    }
+
+    private static void addContent(List<Character> list, String fileName) throws FileNotFoundException {
+        FileInputStream inKeywords = new FileInputStream(fileName);
+        Scanner scanner = new Scanner(inKeywords);
+        while (scanner.hasNext())
+            list.add((char) Integer.parseInt(scanner.next()));
     }
 
     private static void addContentToList(List<String> list, String fileName) throws FileNotFoundException {
