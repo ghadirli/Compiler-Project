@@ -83,7 +83,7 @@ public class Lexer {
             curIndex--;
         }
         if (tokenType == TokenTypes.SYMBOL) {
-            if (input.charAt(curIndex - 1) != '=') {
+            if(curIndex>1 && input.charAt(curIndex-1) != '=' && input.charAt(curIndex-2) == '='){
                 curIndex--;
             }
         }
@@ -111,7 +111,7 @@ public class Lexer {
             initializeTransitionMatrix();
             addContentToList(keywordsList, tokenTypesDirectory + "/KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "/SYMBOLS.txt");
-            addContentToList();
+            addContent(whiteSpaceList, tokenTypesDirectory + "/WHITESPACELIST.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
