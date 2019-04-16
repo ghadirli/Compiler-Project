@@ -149,8 +149,8 @@ public class Lexer {
         transitionMatrix.get(0).set(CharacterTypes.SYMBOL.ordinal(), 13);
         transitionMatrix.get(0).set(CharacterTypes.EQUAL.ordinal(), 3);
         transitionMatrix.get(0).set(CharacterTypes.SLASH.ordinal(), 4);
-        transitionMatrix.get(0).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
-        transitionMatrix.get(0).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(0).set(CharacterTypes.STAR.ordinal(), 13);
+        transitionMatrix.get(0).set(CharacterTypes.ENTER.ordinal(), 0);
         transitionMatrix.get(0).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
         transitionMatrix.get(1).set(CharacterTypes.ALPHABET.ordinal(), 1);
@@ -159,7 +159,7 @@ public class Lexer {
         transitionMatrix.get(1).set(CharacterTypes.SYMBOL.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
         transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
-        transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
         transitionMatrix.get(1).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
