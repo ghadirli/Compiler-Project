@@ -37,7 +37,7 @@ public class Lexer {
 
     }
 
-    private Pair<Token, Integer> getNextToken(String input, int startIndex) {
+    private Pair<Token, Integer> getNextToken(/*String input, */int startIndex) {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
@@ -45,8 +45,20 @@ public class Lexer {
             curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
             curIndex++;
         }
-        res.setDescription(input.substring(startIndex, curIndex)); // TODO handle cases which must go back one index
-        res.setTokenType(acceptStates.get(curState));
+        TokenTypes tokenType = acceptStates.get(curState);
+
+        //handle of cases which must go back one index
+        if(tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
+            curIndex--;
+        }
+        if(tokenType == TokenTypes.SYMBOL){
+            if(input.charAt(curIndex-1) != '='){
+                curIndex--;
+            }
+        }
+
+        res.setDescription(input.substring(startIndex, curIndex));
+        res.setTokenType(tokenType);
 
         //handle of id or keyword
         if(acceptStates.get(curState) == TokenTypes.ID) {
