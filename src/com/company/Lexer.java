@@ -76,6 +76,8 @@ public class Lexer {
     private CharacterTypes checkCharacterTypes(char x) {
         if (x == ' ') {
             return CharacterTypes.WHITESPACE;
+        } else if (x == '\n') {
+            return CharacterTypes.ENTER;
         } else if (x == '=') {
             return CharacterTypes.EQUAL;
         } else if (Character.isDigit(x)) {
