@@ -29,9 +29,13 @@ public class Lexer {
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
         this.input = readInputFromFile(inputFilePath);
+        System.out.println(input);
         preProcess();
     }//
 
+    private void analyzer(){
+
+    }
     private Pair<Token, Integer> getNextToken(int startIndex) {
         Token res = new Token();
         int curState = STARTSTATE;
@@ -77,6 +81,7 @@ public class Lexer {
         transitionMatrix.get(0).set(CharacterTypes.SLASH.ordinal(), 4);
         transitionMatrix.get(0).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
         transitionMatrix.get(0).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(0).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
         transitionMatrix.get(1).set(CharacterTypes.ALPHABET.ordinal(), 1);
         transitionMatrix.get(1).set(CharacterTypes.DIGIT.ordinal(), 1);
@@ -86,6 +91,7 @@ public class Lexer {
         transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
         transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
         transitionMatrix.get(1).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
 
         transitionMatrix.get(2).set(CharacterTypes.DIGIT.ordinal(), 2);
@@ -96,6 +102,7 @@ public class Lexer {
         transitionMatrix.get(2).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.WHITESPACE.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.SYMBOL.ordinal(), ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
         transitionMatrix.get(3).set(CharacterTypes.EQUAL.ordinal(), 14);
         transitionMatrix.get(3).set(CharacterTypes.WHITESPACE.ordinal(), 15);
@@ -105,6 +112,7 @@ public class Lexer {
         transitionMatrix.get(3).set(CharacterTypes.SLASH.ordinal(), 15);
         transitionMatrix.get(3).set(CharacterTypes.STAR.ordinal(), 15);
         transitionMatrix.get(3).set(CharacterTypes.ENTER.ordinal(), 15);
+        transitionMatrix.get(3).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
         for (int i = 0; i < CharacterTypes.values().length; i++) {
             transitionMatrix.get(4).set(i, ERRORSTATE);
@@ -125,6 +133,7 @@ public class Lexer {
         transitionMatrix.get(6).set(CharacterTypes.ENTER.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.SLASH.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.WHITESPACE.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
         for (int i = 0; i < CharacterTypes.values().length; i++) {
             transitionMatrix.get(7).set(i, 6);
