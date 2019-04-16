@@ -5,6 +5,7 @@ public class Token {
     TokenTypes tokenTypes;
 
 
+
 }
 
 enum TokenTypes{
