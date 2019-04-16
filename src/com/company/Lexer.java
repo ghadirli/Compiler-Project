@@ -1,5 +1,7 @@
 package com.company;
 
+import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,6 +41,25 @@ public class Lexer {
     }
 
     private void constructTransitionMatrix() {
+
+    }
+
+    private CharacterTypes checkCharacterTypes(char x) {
+        if (x == ' ') {
+            return CharacterTypes.WHITESPACE;
+        } else if (x == '=') {
+            return CharacterTypes.EQUAL;
+        } else if (Character.isDigit(x)) {
+            return CharacterTypes.DIGIT;
+        } else if (Character.isLetter(x)) {
+            return CharacterTypes.ALPHABET;
+        } else if (x == '*') {
+            return CharacterTypes.STAR;
+        } else if (x == '/') {
+            return CharacterTypes.SLASH;
+        } else if (symbolsList.contains(x)) {
+            return CharacterTypes.SYMBOL;
+        } else return CharacterTypes.OTHER;
 
     }
 
