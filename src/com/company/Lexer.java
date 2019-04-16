@@ -24,6 +24,8 @@ public class Lexer {
     private String inputFilePath;
     private int lineNumber;
     private final int ERRORSTATE = 2999;
+    private final int numberOfStates = 15;
+    private final int initialNumber = -1;
 
 
     public Lexer(String inputFilePath) {
@@ -33,23 +35,16 @@ public class Lexer {
     }//
 
     private void getToNextToken() {
+
         //TODO
     }
 
-    private void initializeAcceptedStates() {
-        acceptStates.put(ERRORSTATE, TokenTypes.ERROR);
-        acceptStates.put(10, TokenTypes.ID); //TODO must check for symbols
-        acceptStates.put(12, TokenTypes.NUM);
-        acceptStates.put(13, TokenTypes.SYMBOL);
-        acceptStates.put(15, TokenTypes.SYMBOL);
-        acceptStates.put(14, TokenTypes.SYMBOL);
-        acceptStates.put(16, TokenTypes.COMMENT);
-    }
 
     private void preProcess() {
         String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
         try {
             initializeAcceptedStates();
+            initializeTransitionMatrix();
             constructTransitionMatrix();
             addContentToList(keywordsList, tokenTypesDirectory + "\\KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "\\SYMBOLS.txt");
@@ -58,11 +53,17 @@ public class Lexer {
         }
     }
 
-    private void constructTransitionMatrix() {
-        final int numberOfStates = 10;
+    private void initializeTransitionMatrix() {
         for (int i = 0; i < numberOfStates; i++) {
             transitionMatrix.add(new ArrayList<>());
+            for (int j = 0; j < CharacterTypes.values().length; j++) {
+                transitionMatrix.get(i).add(initialNumber);
+            }
         }
+    }
+
+    private void constructTransitionMatrix() {
+
         transitionMatrix.get(0).set(CharacterTypes.WHITESPACE.ordinal(), 0);
         transitionMatrix.get(0).set(CharacterTypes.DIGIT.ordinal(), 2);
         transitionMatrix.get(0).set(CharacterTypes.ALPHABET.ordinal(), 1);
@@ -84,7 +85,7 @@ public class Lexer {
 
         transitionMatrix.get(2).set(CharacterTypes.DIGIT.ordinal(), 2);
         transitionMatrix.get(2).set(CharacterTypes.ALPHABET.ordinal(), 11);
-        transitionMatrix.get(2).set(CharacterTypes.ENTER.ordinal(),ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
@@ -101,7 +102,7 @@ public class Lexer {
         transitionMatrix.get(3).set(CharacterTypes.ENTER.ordinal(), 15);
 
         for (int i = 0; i < CharacterTypes.values().length; i++) {
-            transitionMatrix.get(4).set(i,ERRORSTATE);
+            transitionMatrix.get(4).set(i, ERRORSTATE);
         }
         transitionMatrix.get(4).set(CharacterTypes.SLASH.ordinal(), 5);
         transitionMatrix.get(4).set(CharacterTypes.STAR.ordinal(), 6);
@@ -130,6 +131,7 @@ public class Lexer {
 
     private int getNextState(int curState, char seenCharacter) {
         //TODO
+
         return 0;
     }
 
@@ -196,6 +198,16 @@ public class Lexer {
         }
         return sb.toString();
 
+    }
+
+    private void initializeAcceptedStates() {
+        acceptStates.put(ERRORSTATE, TokenTypes.ERROR);
+        acceptStates.put(10, TokenTypes.ID); //TODO must check for symbols
+        acceptStates.put(12, TokenTypes.NUM);
+        acceptStates.put(13, TokenTypes.SYMBOL);
+        acceptStates.put(15, TokenTypes.SYMBOL);
+        acceptStates.put(14, TokenTypes.SYMBOL);
+        acceptStates.put(16, TokenTypes.COMMENT);
     }
 
 }
