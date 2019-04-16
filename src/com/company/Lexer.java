@@ -11,13 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.io.*;
+
 import com.company.TokenTypes;
 
 
-
 public class Lexer {
-    private ArrayList<String> keywordsList = new ArrayList<>();
-    private ArrayList<String> symbolsList = new ArrayList<>();
+    private static ArrayList<String> keywordsList = new ArrayList<>();
+    private static ArrayList<String> symbolsList = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> transitionMatrix = new ArrayList<>();
     private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
@@ -35,7 +35,7 @@ public class Lexer {
         //TODO
     }
 
-    private void initializeAcceptedStates(){
+    private void initializeAcceptedStates() {
         acceptStates.put(8, TokenTypes.ERROR);
         acceptStates.put(9, TokenTypes.ERROR);
         acceptStates.put(10, TokenTypes.ID); //TODO must check for symbols
@@ -52,6 +52,7 @@ public class Lexer {
     private void preProcess() {
         String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
         try {
+            initializeAcceptedStates();
             constructTransitionMatrix();
             addContentToList(keywordsList, tokenTypesDirectory + "\\KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "\\SYMBOLS.txt");
@@ -62,15 +63,41 @@ public class Lexer {
 
     private void constructTransitionMatrix() {
         final int numberOfStates = 10;
-        for(int i=0; i<numberOfStates; i++) {
+        for (int i = 0; i < numberOfStates; i++) {
             transitionMatrix.add(new ArrayList<>());
         }
         transitionMatrix.get(0).set(CharacterTypes.WHITESPACE.ordinal(), 0);
+        transitionMatrix.get(0).set(CharacterTypes.DIGIT.ordinal(), 2);
+        transitionMatrix.get(0).set(CharacterTypes.ALPHABET.ordinal(), 1);
+        transitionMatrix.get(0).set(CharacterTypes.SYMBOL.ordinal(), 13);
+        transitionMatrix.get(0).set(CharacterTypes.EQUAL.ordinal(), 3);
+        transitionMatrix.get(0).set(CharacterTypes.SLASH.ordinal(), 4);
+
+        transitionMatrix.get(1).set(CharacterTypes.ALPHABET.ordinal(), 1);
+        transitionMatrix.get(1).set(CharacterTypes.DIGIT.ordinal(), 1);
+        transitionMatrix.get(1).set(CharacterTypes.WHITESPACE.ordinal(), 10);
+        transitionMatrix.get(1).set(CharacterTypes.SYMBOL.ordinal(), 10);
+
+        transitionMatrix.get(2).set(CharacterTypes.DIGIT.ordinal(), 2);
+        transitionMatrix.get(2).set(CharacterTypes.ALPHABET.ordinal(), 11);
+
+        transitionMatrix.get(3).set(CharacterTypes.EQUAL.ordinal(), 14);
+
+
+
+        transitionMatrix.get(4).set(CharacterTypes.SLASH.ordinal(), 5);
+        transitionMatrix.get(4).set(CharacterTypes.STAR.ordinal(), 6);
+
+        transitionMatrix.get(6).set(CharacterTypes.STAR.ordinal(), 7);
+
+        transitionMatrix.get(7).set(CharacterTypes.SLASH.ordinal(), 17);
+
 
     }
 
-    private int getNextState(int curState, char seenCharacter){
+    private int getNextState(int curState, char seenCharacter) {
         //TODO
+        return 0;
     }
 
     private CharacterTypes checkCharacterTypes(char x) {
@@ -88,7 +115,7 @@ public class Lexer {
             return CharacterTypes.STAR;
         } else if (x == '/') {
             return CharacterTypes.SLASH;
-        } else if (symbolsList.contains(x)) {
+        } else if (symbolsList.contains("" + x)) {
             return CharacterTypes.SYMBOL;
         } else return CharacterTypes.OTHER;
 
