@@ -23,6 +23,7 @@ public class Lexer {
     private String input;
     private String inputFilePath;
     private int lineNumber;
+    private final int ERRORSTATE = 2999;
 
 
     public Lexer(String inputFilePath) {
@@ -36,17 +37,13 @@ public class Lexer {
     }
 
     private void initializeAcceptedStates() {
-        acceptStates.put(8, TokenTypes.ERROR);
-        acceptStates.put(9, TokenTypes.ERROR);
+        acceptStates.put(ERRORSTATE, TokenTypes.ERROR);
         acceptStates.put(10, TokenTypes.ID); //TODO must check for symbols
-        acceptStates.put(11, TokenTypes.ERROR);
         acceptStates.put(12, TokenTypes.NUM);
         acceptStates.put(13, TokenTypes.SYMBOL);
-        acceptStates.put(14, TokenTypes.SYMBOL);
         acceptStates.put(15, TokenTypes.SYMBOL);
+        acceptStates.put(14, TokenTypes.SYMBOL);
         acceptStates.put(16, TokenTypes.COMMENT);
-        acceptStates.put(17, TokenTypes.COMMENT);
-        acceptStates.put(18, TokenTypes.ERROR);
     }
 
     private void preProcess() {
@@ -72,25 +69,44 @@ public class Lexer {
         transitionMatrix.get(0).set(CharacterTypes.SYMBOL.ordinal(), 13);
         transitionMatrix.get(0).set(CharacterTypes.EQUAL.ordinal(), 3);
         transitionMatrix.get(0).set(CharacterTypes.SLASH.ordinal(), 4);
+        transitionMatrix.get(0).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
+        transitionMatrix.get(0).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
 
         transitionMatrix.get(1).set(CharacterTypes.ALPHABET.ordinal(), 1);
         transitionMatrix.get(1).set(CharacterTypes.DIGIT.ordinal(), 1);
         transitionMatrix.get(1).set(CharacterTypes.WHITESPACE.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.SYMBOL.ordinal(), 10);
+        transitionMatrix.get(1).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
+
 
         transitionMatrix.get(2).set(CharacterTypes.DIGIT.ordinal(), 2);
         transitionMatrix.get(2).set(CharacterTypes.ALPHABET.ordinal(), 11);
+        transitionMatrix.get(2).set(CharacterTypes.ENTER.ordinal(),ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.WHITESPACE.ordinal(), ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.)
 
         transitionMatrix.get(3).set(CharacterTypes.EQUAL.ordinal(), 14);
-
 
 
         transitionMatrix.get(4).set(CharacterTypes.SLASH.ordinal(), 5);
         transitionMatrix.get(4).set(CharacterTypes.STAR.ordinal(), 6);
 
         transitionMatrix.get(6).set(CharacterTypes.STAR.ordinal(), 7);
+        transitionMatrix.get(6).set(CharacterTypes.EQUAL.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.ALPHABET.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.DIGIT.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.SYMBOL.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.ENTER.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.SLASH.ordinal(), 6);
+        transitionMatrix.get(6).set(CharacterTypes.WHITESPACE.ordinal(), 6);
 
-        transitionMatrix.get(7).set(CharacterTypes.SLASH.ordinal(), 17);
+        transitionMatrix.get(7).set(CharacterTypes.SLASH.ordinal(), 16);
 
 
     }
