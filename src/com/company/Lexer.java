@@ -20,19 +20,25 @@ public class Lexer {
     private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
     private String inputFilePath;
-    private int lineNumber = 0;
+    private static int lineNumber = 1;
+    private static int lastPrintedLineNumber = 0;
+    private static int lastPrintedErrLineNumber = 0; // TODO remove static
+    private boolean[] isCheckedEnter;
     private final int ERRORSTATE = 2999;
     private final int numberOfStates = 20;
     private final int initialNumber = -1;
     private final int STARTSTATE = 0;
     private String outputFilePath;
+    private String errorFilePath;
 //    private HashMap<Integer, String>
 
 
-    public Lexer(String inputFilePath, String outputFilePath) {
+    public Lexer(String inputFilePath, String outputFilePath, String errorFilePath) {
         this.inputFilePath = inputFilePath;
         this.input = readInputFromFile(inputFilePath) + '\n' + ' ';
+        isCheckedEnter = new boolean[input.length()];
         this.outputFilePath = outputFilePath;
+        this.errorFilePath = errorFilePath;
         //System.out.println(input);
         preProcess();
     }//
@@ -40,39 +46,65 @@ public class Lexer {
     public void analyzer() {
         Token currentToken = new Token();
         Integer curser = 0;
-        Integer lineNumber = 0;
+        //Integer lineNumber = 0;
         int size = input.length();
-        while (curser < size-1) {
+        while (curser < size - 1) {
             Pair<Token, Integer> tokenPair = getNextToken(curser);
-            if(tokenPair.getKey().getTokenType() == TokenTypes.EOF)
+            if (tokenPair.getKey().getTokenType() == TokenTypes.EOF)
                 return;
 //            System.out.println(tokenPair.getValue());
             curser = tokenPair.getValue();
 //            System.out.println("index :" + curser + " line number is " + countLines(input.substring(0, curser)) + " description is " +
 //                    tokenPair.getKey().getDescription() + " and token is " + tokenPair.getKey().getTokenType());
-            writeInFile(countLines(input.substring(0, curser)), tokenPair.getKey());
+            if (tokenPair.getKey().getTokenType() != TokenTypes.COMMENT) {
+                if(tokenPair.getKey().getTokenType() != TokenTypes.ERROR) {
+                    if(lineNumber != lastPrintedLineNumber){
+                        writeInFile("\n" + lineNumber, outputFilePath);
+                        lastPrintedLineNumber = lineNumber;
+                    }
+                    writeInFile(tokenPair.getKey(), outputFilePath);
+                }
+                else {
+                    if(lineNumber != lastPrintedErrLineNumber){
+                        writeInFile("\n" + lineNumber, errorFilePath);
+                        lastPrintedErrLineNumber = lineNumber;
+                    }
+                    writeInErrFile(tokenPair.getKey(), errorFilePath);
+                }
+            }
         }
 
     }
 
-    private void writeInFile(Integer lineNo, Token token) {
-        try {
-            FileWriter fileWriter = new FileWriter(outputFilePath);
-            fileWriter.write("(" + token.getTokenType() + ", " + token.getDescription() + ") ");
-            System.out.println("(" + token.getTokenType() + ", " + token.getDescription() + ") ");
+    private void writeInFile(Token token, String path) {
+        String s = "(" + token.getTokenType() + ", " + token.getDescription() + ") ";
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
+            writer.write(s);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static int countLines(String str) {
-        String[] lines = str.split("\r\n|\r|\n");
-        return lines.length;
+    private void writeInErrFile(Token token, String path) {
+        String s = "(" + token.getDescription() + ", invalid input) ";
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
+            writer.write(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private boolean isWhiteSpace(char ch){
-        for(char ch0 : whiteSpaceList){
-            if(ch0 == ch)
+    private void writeInFile(String toBePrinted, String path){
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
+            writer.write(toBePrinted);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isWhiteSpace(char ch) {
+        for (char ch0 : whiteSpaceList) {
+            if (ch0 == ch)
                 return true;
         }
         return false;
@@ -86,15 +118,20 @@ public class Lexer {
         while (curIndex < input.length() && acceptStates.get(curState) == null) { //TODO check correct?
             //System.out.print(curState+" ");
             //System.out.println(input.charAt(curIndex));
+            //TODO clean it up
+            if(input.charAt(curIndex) == '\n' && !isCheckedEnter[curIndex]){
+                lineNumber++;
+                isCheckedEnter[curIndex] = true;
+            }
             curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
-            if(whiteSpaceUntilNow && (isWhiteSpace(input.charAt(curIndex)) || input.charAt(curIndex) == '\n')){
+            if (whiteSpaceUntilNow && (isWhiteSpace(input.charAt(curIndex)) || input.charAt(curIndex) == '\n')) {
                 startIndex++;
             } else {
                 whiteSpaceUntilNow = false;
             }
             curIndex++;
         }
-        if(curIndex >= input.length()) {
+        if (curIndex >= input.length()) {
             res.setDescription(input.substring(startIndex, curIndex));
             res.setTokenType(TokenTypes.EOF);
             return new Pair<>(res, curIndex);
@@ -103,10 +140,18 @@ public class Lexer {
 
         //handle of cases which must go back one index
         if (tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
+            if(input.charAt(curIndex) == '\n' && isCheckedEnter[curIndex]){
+                lineNumber--;
+                isCheckedEnter[curIndex] = false;
+            }
             curIndex--;
         }
         if (tokenType == TokenTypes.SYMBOL) {
-            if(curIndex>1 && input.charAt(curIndex-1) != '=' && input.charAt(curIndex-2) == '='){
+            if (curIndex > 1 && input.charAt(curIndex - 1) != '=' && input.charAt(curIndex - 2) == '=') {
+                if(input.charAt(curIndex) == '\n' && isCheckedEnter[curIndex]){
+                    lineNumber--;
+                    isCheckedEnter[curIndex] = false;
+                }
                 curIndex--;
             }
         }

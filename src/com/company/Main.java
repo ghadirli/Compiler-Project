@@ -9,7 +9,7 @@ public class Main {
 
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company/InputFiles";
         String sampleOutputDirectory = System.getProperty("user.dir") + "/src/com/company/OutputFiles";
-        Lexer lexer = new Lexer(sampleInputDirectory + "/Input1", sampleOutputDirectory + "/Scanner");
+        Lexer lexer = new Lexer(sampleInputDirectory + "/Input1", sampleOutputDirectory + "/scanner.txt", sampleOutputDirectory + "/lexical_errors.txt");
         lexer.analyzer();
     }
 
