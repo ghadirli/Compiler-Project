@@ -31,7 +31,7 @@ public class Lexer {
 
     public Lexer(String inputFilePath, String outputFilePath) {
         this.inputFilePath = inputFilePath;
-        this.input = readInputFromFile(inputFilePath) + '\n';
+        this.input = readInputFromFile(inputFilePath) + '\n' + ' ';
         this.outputFilePath = outputFilePath;
         //System.out.println(input);
         preProcess();
@@ -68,12 +68,26 @@ public class Lexer {
         return lines.length;
     }
 
+    private boolean isWhiteSpace(char ch){
+        for(char ch0 : whiteSpaceList){
+            if(ch0 == ch)
+                return true;
+        }
+        return false;
+    }
+
     private Pair<Token, Integer> getNextToken(int startIndex) {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
+        boolean whiteSpaceUntilNow = true;
         while (acceptStates.get(curState) == null) { //TODO check correct?
             curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
+            if(whiteSpaceUntilNow && isWhiteSpace(input.charAt(curIndex))){
+                startIndex++;
+            } else {
+                whiteSpaceUntilNow = false;
+            }
             curIndex++;
         }
         TokenTypes tokenType = acceptStates.get(curState);
