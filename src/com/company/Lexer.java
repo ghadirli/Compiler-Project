@@ -22,7 +22,7 @@ public class Lexer {
     private String inputFilePath;
     private int lineNumber = 0;
     private final int ERRORSTATE = 2999;
-    private final int numberOfStates = 15;
+    private final int numberOfStates = 20;
     private final int initialNumber = -1;
     private final int STARTSTATE = 0;
     private String outputFilePath;
@@ -42,8 +42,10 @@ public class Lexer {
         Integer curser = 0;
         Integer lineNumber = 0;
         int size = input.length();
-        while (curser < size) {
+        while (curser < size-1) {
             Pair<Token, Integer> tokenPair = getNextToken(curser);
+            if(tokenPair.getKey().getTokenType() == TokenTypes.EOF)
+                return;
 //            System.out.println(tokenPair.getValue());
             curser = tokenPair.getValue();
 //            System.out.println("index :" + curser + " line number is " + countLines(input.substring(0, curser)) + " description is " +
@@ -81,14 +83,21 @@ public class Lexer {
         int curState = STARTSTATE;
         int curIndex = startIndex;
         boolean whiteSpaceUntilNow = true;
-        while (acceptStates.get(curState) == null) { //TODO check correct?
+        while (curIndex < input.length() && acceptStates.get(curState) == null) { //TODO check correct?
+            //System.out.print(curState+" ");
+            //System.out.println(input.charAt(curIndex));
             curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
-            if(whiteSpaceUntilNow && isWhiteSpace(input.charAt(curIndex))){
+            if(whiteSpaceUntilNow && (isWhiteSpace(input.charAt(curIndex)) || input.charAt(curIndex) == '\n')){
                 startIndex++;
             } else {
                 whiteSpaceUntilNow = false;
             }
             curIndex++;
+        }
+        if(curIndex >= input.length()) {
+            res.setDescription(input.substring(startIndex, curIndex));
+            res.setTokenType(TokenTypes.EOF);
+            return new Pair<>(res, curIndex);
         }
         TokenTypes tokenType = acceptStates.get(curState);
 
@@ -123,6 +132,7 @@ public class Lexer {
         try {
             initializeAcceptedStates();
             initializeTransitionMatrix();
+
             addContentToList(keywordsList, tokenTypesDirectory + "/KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "/SYMBOLS.txt");
             addContent(whiteSpaceList, tokenTypesDirectory + "/WHITESPACELIST.txt");
@@ -149,17 +159,17 @@ public class Lexer {
         transitionMatrix.get(0).set(CharacterTypes.SYMBOL.ordinal(), 13);
         transitionMatrix.get(0).set(CharacterTypes.EQUAL.ordinal(), 3);
         transitionMatrix.get(0).set(CharacterTypes.SLASH.ordinal(), 4);
-        transitionMatrix.get(0).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
-        transitionMatrix.get(0).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(0).set(CharacterTypes.STAR.ordinal(), 13);
+        transitionMatrix.get(0).set(CharacterTypes.ENTER.ordinal(), 0);
         transitionMatrix.get(0).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
         transitionMatrix.get(1).set(CharacterTypes.ALPHABET.ordinal(), 1);
         transitionMatrix.get(1).set(CharacterTypes.DIGIT.ordinal(), 1);
         transitionMatrix.get(1).set(CharacterTypes.WHITESPACE.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.SYMBOL.ordinal(), 10);
-        transitionMatrix.get(1).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
-        transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
-        transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.STAR.ordinal(), 10);
+        transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), 10);
+        transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
         transitionMatrix.get(1).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
 
@@ -190,6 +200,7 @@ public class Lexer {
         transitionMatrix.get(4).set(CharacterTypes.SLASH.ordinal(), 5);
         transitionMatrix.get(4).set(CharacterTypes.STAR.ordinal(), 6);
 
+
         for (int i = 0; i < CharacterTypes.values().length; i++) {
             transitionMatrix.get(5).set(i, 5);
         }
@@ -203,7 +214,7 @@ public class Lexer {
         transitionMatrix.get(6).set(CharacterTypes.ENTER.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.SLASH.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.WHITESPACE.ordinal(), 6);
-        transitionMatrix.get(6).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(6).set(CharacterTypes.OTHER.ordinal(), 6);
 
         for (int i = 0; i < CharacterTypes.values().length; i++) {
             transitionMatrix.get(7).set(i, 6);
@@ -219,7 +230,7 @@ public class Lexer {
     }
 
     private CharacterTypes checkCharacterTypes(char x) {
-        if (x == ' ') {
+        if (whiteSpaceList.contains(x)) {
             return CharacterTypes.WHITESPACE;
         } else if (x == '\n') {
             return CharacterTypes.ENTER;
