@@ -30,11 +30,16 @@ public class Lexer {
     private void preProcess() {
         String tokenTypesDirectory = System.getProperty("user.dir") + "\\src\\com\\company\\InputFiles\\Token Types";
         try {
+            constructTransitionMatrix();
             addContentToList(keywordsList, tokenTypesDirectory + "\\KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "\\SYMBOLS.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private void constructTransitionMatrix() {
+
     }
 
     private static void addContentToList(List<String> list, String fileName) throws FileNotFoundException {
