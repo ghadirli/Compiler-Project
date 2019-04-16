@@ -6,7 +6,8 @@ public class Main {
 //        String tmps = "sd\n\tk";
 //        System.out.println(tmps.charAt(3));
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company/InputFiles";
-        Lexer lexer = new Lexer(sampleInputDirectory + "/Input1");
+        String sampleOutputDirectory = System.getProperty("user.dir") + "/src/com/company/OutputFiles";
+        Lexer lexer = new Lexer(sampleInputDirectory + "/Input1", sampleOutputDirectory + "/Scanner");
         lexer.analyzer();
     }
 

@@ -28,10 +28,11 @@ public class Lexer {
 //    private HashMap<Integer, String>
 
 
-    public Lexer(String inputFilePath) {
+    public Lexer(String inputFilePath, String outputFilePath) {
         this.inputFilePath = inputFilePath;
         this.input = readInputFromFile(inputFilePath) + '\n';
-        System.out.println(input);
+        this.outputFilePath = outputFilePath;
+        //System.out.println(input);
         preProcess();
     }//
 
@@ -42,17 +43,23 @@ public class Lexer {
         int size = input.length();
         while (curser < size) {
             Pair<Token, Integer> tokenPair = getNextToken(curser);
-            System.out.println(tokenPair.getValue());
+//            System.out.println(tokenPair.getValue());
             curser = tokenPair.getValue();
-            System.out.println("line number is " + countLines(input.substring(0, curser)) + " description is " +
-                    tokenPair.getKey().getDescription() + " and token is " + tokenPair.getKey().getTokenType());
-//            writeInFile(countLines(input.substring(0, curser)), tokenPair.getKey());
+//            System.out.println("index :" + curser + " line number is " + countLines(input.substring(0, curser)) + " description is " +
+//                    tokenPair.getKey().getDescription() + " and token is " + tokenPair.getKey().getTokenType());
+            writeInFile(countLines(input.substring(0, curser)), tokenPair.getKey());
         }
 
     }
 
-    private void writeInFile(Integer lineNo, Token string) {
-
+    private void writeInFile(Integer lineNo, Token token) {
+        try {
+            FileWriter fileWriter = new FileWriter(outputFilePath);
+            fileWriter.write("(" + token.getTokenType() + ", " + token.getDescription() + ") ");
+            System.out.println("(" + token.getTokenType() + ", " + token.getDescription() + ") ");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static int countLines(String str) {
@@ -64,7 +71,7 @@ public class Lexer {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
-        while(acceptStates.get(curState) != null) { //TODO check correct?
+        while(acceptStates.get(curState) == null) { //TODO check correct?
             curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
             curIndex++;
         }
@@ -75,7 +82,7 @@ public class Lexer {
             curIndex--;
         }
         if(tokenType == TokenTypes.SYMBOL){
-            if(input.charAt(curIndex-1) != '='){
+            if(curIndex>1 && input.charAt(curIndex-1) != '=' && input.charAt(curIndex-2) == '='){
                 curIndex--;
             }
         }
