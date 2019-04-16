@@ -30,7 +30,6 @@ public class Lexer {
     private final int STARTSTATE = 0;
     private String outputFilePath;
     private String errorFilePath;
-//    private HashMap<Integer, String>
 
 
     public Lexer(String inputFilePath, String outputFilePath, String errorFilePath) {
@@ -39,34 +38,35 @@ public class Lexer {
         isCheckedEnter = new boolean[input.length()];
         this.outputFilePath = outputFilePath;
         this.errorFilePath = errorFilePath;
-        //System.out.println(input);
         preProcess();
-    }//
+    }
 
     public void analyzer() {
-        Token currentToken = new Token();
-        Integer curser = 0;
-        //Integer lineNumber = 0;
+        writeInFile("", outputFilePath, false);
+        writeInFile("", errorFilePath, false);
+        Integer cursor = 0;
         int size = input.length();
-        while (curser < size - 1) {
-            Pair<Token, Integer> tokenPair = getNextToken(curser);
+        while (cursor < size - 1) {
+            Pair<Token, Integer> tokenPair = getNextToken(cursor);
             if (tokenPair.getKey().getTokenType() == TokenTypes.EOF)
                 return;
-//            System.out.println(tokenPair.getValue());
-            curser = tokenPair.getValue();
-//            System.out.println("index :" + curser + " line number is " + countLines(input.substring(0, curser)) + " description is " +
-//                    tokenPair.getKey().getDescription() + " and token is " + tokenPair.getKey().getTokenType());
+            cursor = tokenPair.getValue();
             if (tokenPair.getKey().getTokenType() != TokenTypes.COMMENT) {
+                String nextLineOrEmpty = "\n";
                 if(tokenPair.getKey().getTokenType() != TokenTypes.ERROR) {
+                    if(lastPrintedLineNumber == 0)
+                        nextLineOrEmpty = "";
                     if(lineNumber != lastPrintedLineNumber){
-                        writeInFile("\n" + lineNumber, outputFilePath);
+                        writeInFile(nextLineOrEmpty + lineNumber + ". ", outputFilePath);
                         lastPrintedLineNumber = lineNumber;
                     }
                     writeInFile(tokenPair.getKey(), outputFilePath);
                 }
                 else {
+                    if(lastPrintedErrLineNumber == 0)
+                        nextLineOrEmpty = "";
                     if(lineNumber != lastPrintedErrLineNumber){
-                        writeInFile("\n" + lineNumber, errorFilePath);
+                        writeInFile(nextLineOrEmpty + lineNumber + ". ", errorFilePath);
                         lastPrintedErrLineNumber = lineNumber;
                     }
                     writeInErrFile(tokenPair.getKey(), errorFilePath);
@@ -95,7 +95,11 @@ public class Lexer {
     }
 
     private void writeInFile(String toBePrinted, String path){
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
+        writeInFile(toBePrinted, path, true);
+    }
+
+    private void writeInFile(String toBePrinted, String path, boolean append){
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, append), "utf-8"))) {
             writer.write(toBePrinted);
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +119,7 @@ public class Lexer {
         int curState = STARTSTATE;
         int curIndex = startIndex;
         boolean whiteSpaceUntilNow = true;
-        while (curIndex < input.length() && acceptStates.get(curState) == null) { //TODO check correct?
+        while (curIndex < input.length() && acceptStates.get(curState) == null) { //check correct?
             //System.out.print(curState+" ");
             //System.out.println(input.charAt(curIndex));
             //TODO clean it up
@@ -123,7 +127,7 @@ public class Lexer {
                 lineNumber++;
                 isCheckedEnter[curIndex] = true;
             }
-            curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
+            curState = getNextState(curState, input.charAt(curIndex)); // handle curIndex = end Of File
             if (whiteSpaceUntilNow && (isWhiteSpace(input.charAt(curIndex)) || input.charAt(curIndex) == '\n')) {
                 startIndex++;
             } else {
@@ -140,19 +144,19 @@ public class Lexer {
 
         //handle of cases which must go back one index
         if (tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
+            curIndex--;
             if(input.charAt(curIndex) == '\n' && isCheckedEnter[curIndex]){
                 lineNumber--;
                 isCheckedEnter[curIndex] = false;
             }
-            curIndex--;
         }
         if (tokenType == TokenTypes.SYMBOL) {
             if (curIndex > 1 && input.charAt(curIndex - 1) != '=' && input.charAt(curIndex - 2) == '=') {
+                curIndex--;
                 if(input.charAt(curIndex) == '\n' && isCheckedEnter[curIndex]){
                     lineNumber--;
                     isCheckedEnter[curIndex] = false;
                 }
-                curIndex--;
             }
         }
 
