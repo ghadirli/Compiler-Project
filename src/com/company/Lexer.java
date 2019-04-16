@@ -1,7 +1,6 @@
 package com.company;
 
 import javafx.util.Pair;
-import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,8 +30,7 @@ public class Lexer {
 
     public Lexer(String inputFilePath) {
         this.inputFilePath = inputFilePath;
-        this.outputFilePath =
-                this.input = readInputFromFile(inputFilePath);
+        this.input = readInputFromFile(inputFilePath) + '\n';
         System.out.println(input);
         preProcess();
     }//
@@ -66,14 +64,35 @@ public class Lexer {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
-        while (acceptStates.get(curState) != null) { //TODO check correct?
-            curState = getNextState(curState, input.charAt(curIndex));
+        while(acceptStates.get(curState) != null) { //TODO check correct?
+            curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
             curIndex++;
         }
-        res.setDescription(input.substring(startIndex, curIndex)); // TODO handle cases which must go back one index
-        res.setTokenType(acceptStates.get(curState));
+        TokenTypes tokenType = acceptStates.get(curState);
+
+        //handle of cases which must go back one index
+        if(tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
+            curIndex--;
+        }
+        if(tokenType == TokenTypes.SYMBOL){
+            if(input.charAt(curIndex-1) != '='){
+                curIndex--;
+            }
+        }
+
+        res.setDescription(input.substring(startIndex, curIndex));
+        res.setTokenType(tokenType);
+
+        //handle of id or keyword
+        if(acceptStates.get(curState) == TokenTypes.ID) {
+            for(String keyword : keywordsList){
+                if(res.getDescription().equals(keyword)) {
+                    res.setTokenType(TokenTypes.KEYWORD);
+                }
+            }
+        }
+
         return new Pair<>(res, curIndex);
-        //TODO
     }
 
 
@@ -204,15 +223,6 @@ public class Lexer {
             list.add(scanner.next());
     }
 
-    public ArrayList<String> getKeywordsList() {
-        return keywordsList;
-    }
-
-    public ArrayList<String> getSymbolsList() {
-        return symbolsList;
-    }
-
-
     public String readInputFromFile(String fileName) {
         InputStream is = null;
         try {
@@ -251,4 +261,12 @@ public class Lexer {
         acceptStates.put(16, TokenTypes.COMMENT);
     }
 
+    //-------------getter and setter------------------------
+    public ArrayList<String> getKeywordsList() {
+        return keywordsList;
+    }
+
+    public ArrayList<String> getSymbolsList() {
+        return symbolsList;
+    }
 }
