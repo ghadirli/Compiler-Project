@@ -20,57 +20,95 @@ public class Lexer {
     private HashMap<Integer, TokenTypes> acceptStates = new HashMap<>();
     private String input;
     private String inputFilePath;
-    private int lineNumber = 0;
+    private static int lineNumber = 1;
+    private static int lastPrintedLineNumber = 0;
+    private static int lastPrintedErrLineNumber = 0; // TODO remove static
+    private boolean[] isCheckedEnter;
     private final int ERRORSTATE = 2999;
-    private final int numberOfStates = 15;
+    private final int numberOfStates = 20;
     private final int initialNumber = -1;
     private final int STARTSTATE = 0;
     private String outputFilePath;
-//    private HashMap<Integer, String>
+    private String errorFilePath;
 
 
-    public Lexer(String inputFilePath, String outputFilePath) {
+    public Lexer(String inputFilePath, String outputFilePath, String errorFilePath) {
         this.inputFilePath = inputFilePath;
         this.input = readInputFromFile(inputFilePath) + '\n' + ' ';
+        isCheckedEnter = new boolean[input.length()];
         this.outputFilePath = outputFilePath;
-        //System.out.println(input);
+        this.errorFilePath = errorFilePath;
         preProcess();
-    }//
+    }
 
     public void analyzer() {
-        Token currentToken = new Token();
-        Integer curser = 0;
-        Integer lineNumber = 0;
+        writeInFile("", outputFilePath, false);
+        writeInFile("", errorFilePath, false);
+        Integer cursor = 0;
         int size = input.length();
-        while (curser < size) {
-            Pair<Token, Integer> tokenPair = getNextToken(curser);
-//            System.out.println(tokenPair.getValue());
-            curser = tokenPair.getValue();
-//            System.out.println("index :" + curser + " line number is " + countLines(input.substring(0, curser)) + " description is " +
-//                    tokenPair.getKey().getDescription() + " and token is " + tokenPair.getKey().getTokenType());
-            writeInFile(countLines(input.substring(0, curser)), tokenPair.getKey());
+        while (cursor < size - 1) {
+            Pair<Token, Integer> tokenPair = getNextToken(cursor);
+            if (tokenPair.getKey().getTokenType() == TokenTypes.EOF)
+                return;
+            cursor = tokenPair.getValue();
+            if (tokenPair.getKey().getTokenType() != TokenTypes.COMMENT) {
+                String nextLineOrEmpty = "\n";
+                if(tokenPair.getKey().getTokenType() != TokenTypes.ERROR) {
+                    if(lastPrintedLineNumber == 0)
+                        nextLineOrEmpty = "";
+                    if(lineNumber != lastPrintedLineNumber){
+                        writeInFile(nextLineOrEmpty + lineNumber + ". ", outputFilePath);
+                        lastPrintedLineNumber = lineNumber;
+                    }
+                    writeInFile(tokenPair.getKey(), outputFilePath);
+                }
+                else {
+                    if(lastPrintedErrLineNumber == 0)
+                        nextLineOrEmpty = "";
+                    if(lineNumber != lastPrintedErrLineNumber){
+                        writeInFile(nextLineOrEmpty + lineNumber + ". ", errorFilePath);
+                        lastPrintedErrLineNumber = lineNumber;
+                    }
+                    writeInErrFile(tokenPair.getKey(), errorFilePath);
+                }
+            }
         }
 
     }
 
-    private void writeInFile(Integer lineNo, Token token) {
-        try {
-            FileWriter fileWriter = new FileWriter(outputFilePath);
-            fileWriter.write("(" + token.getTokenType() + ", " + token.getDescription() + ") ");
-            System.out.println("(" + token.getTokenType() + ", " + token.getDescription() + ") ");
+    private void writeInFile(Token token, String path) {
+        String s = "(" + token.getTokenType() + ", " + token.getDescription() + ") ";
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
+            writer.write(s);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static int countLines(String str) {
-        String[] lines = str.split("\r\n|\r|\n");
-        return lines.length;
+    private void writeInErrFile(Token token, String path) {
+        String s = "(" + token.getDescription() + ", invalid input) ";
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
+            writer.write(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private boolean isWhiteSpace(char ch){
-        for(char ch0 : whiteSpaceList){
-            if(ch0 == ch)
+    private void writeInFile(String toBePrinted, String path){
+        writeInFile(toBePrinted, path, true);
+    }
+
+    private void writeInFile(String toBePrinted, String path, boolean append){
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, append), "utf-8"))) {
+            writer.write(toBePrinted);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isWhiteSpace(char ch) {
+        for (char ch0 : whiteSpaceList) {
+            if (ch0 == ch)
                 return true;
         }
         return false;
@@ -81,24 +119,44 @@ public class Lexer {
         int curState = STARTSTATE;
         int curIndex = startIndex;
         boolean whiteSpaceUntilNow = true;
-        while (acceptStates.get(curState) == null) { //TODO check correct?
-            curState = getNextState(curState, input.charAt(curIndex)); // TODO handle curIndex = end Of File
-            if(whiteSpaceUntilNow && isWhiteSpace(input.charAt(curIndex))){
+        while (curIndex < input.length() && acceptStates.get(curState) == null) { //check correct?
+            //System.out.print(curState+" ");
+            //System.out.println(input.charAt(curIndex));
+            //TODO clean it up
+            if(input.charAt(curIndex) == '\n' && !isCheckedEnter[curIndex]){
+                lineNumber++;
+                isCheckedEnter[curIndex] = true;
+            }
+            curState = getNextState(curState, input.charAt(curIndex)); // handle curIndex = end Of File
+            if (whiteSpaceUntilNow && (isWhiteSpace(input.charAt(curIndex)) || input.charAt(curIndex) == '\n')) {
                 startIndex++;
             } else {
                 whiteSpaceUntilNow = false;
             }
             curIndex++;
         }
+        if (curIndex >= input.length()) {
+            res.setDescription(input.substring(startIndex, curIndex));
+            res.setTokenType(TokenTypes.EOF);
+            return new Pair<>(res, curIndex);
+        }
         TokenTypes tokenType = acceptStates.get(curState);
 
         //handle of cases which must go back one index
         if (tokenType == TokenTypes.ID /*or keyword(because not handled by now)*/ || tokenType == TokenTypes.NUM) {
             curIndex--;
+            if(input.charAt(curIndex) == '\n' && isCheckedEnter[curIndex]){
+                lineNumber--;
+                isCheckedEnter[curIndex] = false;
+            }
         }
         if (tokenType == TokenTypes.SYMBOL) {
-            if(curIndex>1 && input.charAt(curIndex-1) != '=' && input.charAt(curIndex-2) == '='){
+            if (curIndex > 1 && input.charAt(curIndex - 1) != '=' && input.charAt(curIndex - 2) == '=') {
                 curIndex--;
+                if(input.charAt(curIndex) == '\n' && isCheckedEnter[curIndex]){
+                    lineNumber--;
+                    isCheckedEnter[curIndex] = false;
+                }
             }
         }
 
@@ -123,6 +181,7 @@ public class Lexer {
         try {
             initializeAcceptedStates();
             initializeTransitionMatrix();
+
             addContentToList(keywordsList, tokenTypesDirectory + "/KEYWORDS.txt");
             addContentToList(symbolsList, tokenTypesDirectory + "/SYMBOLS.txt");
             addContent(whiteSpaceList, tokenTypesDirectory + "/WHITESPACELIST.txt");
@@ -157,8 +216,8 @@ public class Lexer {
         transitionMatrix.get(1).set(CharacterTypes.DIGIT.ordinal(), 1);
         transitionMatrix.get(1).set(CharacterTypes.WHITESPACE.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.SYMBOL.ordinal(), 10);
-        transitionMatrix.get(1).set(CharacterTypes.STAR.ordinal(), ERRORSTATE);
-        transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), ERRORSTATE);
+        transitionMatrix.get(1).set(CharacterTypes.STAR.ordinal(), 10);
+        transitionMatrix.get(1).set(CharacterTypes.EQUAL.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.ENTER.ordinal(), 10);
         transitionMatrix.get(1).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
         transitionMatrix.get(1).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
@@ -190,6 +249,7 @@ public class Lexer {
         transitionMatrix.get(4).set(CharacterTypes.SLASH.ordinal(), 5);
         transitionMatrix.get(4).set(CharacterTypes.STAR.ordinal(), 6);
 
+
         for (int i = 0; i < CharacterTypes.values().length; i++) {
             transitionMatrix.get(5).set(i, 5);
         }
@@ -203,7 +263,7 @@ public class Lexer {
         transitionMatrix.get(6).set(CharacterTypes.ENTER.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.SLASH.ordinal(), 6);
         transitionMatrix.get(6).set(CharacterTypes.WHITESPACE.ordinal(), 6);
-        transitionMatrix.get(6).set(CharacterTypes.OTHER.ordinal(), ERRORSTATE);
+        transitionMatrix.get(6).set(CharacterTypes.OTHER.ordinal(), 6);
 
         for (int i = 0; i < CharacterTypes.values().length; i++) {
             transitionMatrix.get(7).set(i, 6);
@@ -219,7 +279,7 @@ public class Lexer {
     }
 
     private CharacterTypes checkCharacterTypes(char x) {
-        if (x == ' ') {
+        if (whiteSpaceList.contains(x)) {
             return CharacterTypes.WHITESPACE;
         } else if (x == '\n') {
             return CharacterTypes.ENTER;
