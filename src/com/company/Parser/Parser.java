@@ -1,5 +1,8 @@
 package com.company.Parser;
 
+import com.company.Lexer.Lexer;
+import com.company.Lexer.Token;
+import com.company.Lexer.TokenTypes;
 import javafx.util.Pair;
 
 import java.lang.reflect.Array;
@@ -16,7 +19,8 @@ public class Parser {
     private HashMap<String, ArrayList<String>> firstSets;
     private HashMap<String, ArrayList<String>> followSets;
     private Lexer lexer;
-
+    private HashMap<String, TransitionTree> transitionTreesSet;
+    private String cfgBegin = "PROGRAM";
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
         stack = new Stack<>();
@@ -35,12 +39,31 @@ public class Parser {
     }
 
     public void parse(){
-        Token currentToken = null;
+        initializeTransitionTrees();
+        Token currentToken;
         int cursor = 0;
+        String currentNonTerminal = cfgBegin;
         do{
             currentToken = lexer.getNextToken();
-
+            Node curNode = transitionTreesSet.get(currentNonTerminal).getCurrentNode();
+            for(Pair<Node, String> neighbor : curNode.getNeighbours()){
+                if(isInFirst(neighbor.getValue(), currentToken)){
+                    //TODO complete Soroush
+                    transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
+                    break;
+                }
+            }
         } while(currentToken.getTokenType() != TokenTypes.EOF);
+    }
+
+    // for transition trees
+    private void initializeTransitionTrees(){
+        //TODO
+    }
+
+    // check first, for terminals and nonTerminals
+    private boolean isInFirst(String terminalOrNonTerminalName, Token token){
+        //TODO
     }
 
     private void initializeFollowSets() {

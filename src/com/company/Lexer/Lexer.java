@@ -117,7 +117,7 @@ public class Lexer {
     }
 
     // by the lastCursorPosition
-    // not checked for any potential bug
+    // TODO not checked for any potential bug
     public Token getNextToken(){
         Pair<Token, Integer> tokenWithCursor = getNextToken(lastCursorPosition);
         lastCursorPosition = tokenWithCursor.getValue();
