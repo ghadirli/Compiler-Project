@@ -31,6 +31,8 @@ public class Lexer {
     private String outputFilePath;
     private String errorFilePath;
 
+    private int lastCursorPosition = 0;
+
 
     public Lexer(String inputFilePath, String outputFilePath, String errorFilePath) {
         this.inputFilePath = inputFilePath;
@@ -114,7 +116,16 @@ public class Lexer {
         return false;
     }
 
-    private Pair<Token, Integer> getNextToken(int startIndex) {
+    // by the lastCursorPosition
+    // not checked for any potential bug
+    public Token getNextToken(){
+        Pair<Token, Integer> tokenWithCursor = getNextToken(lastCursorPosition);
+        lastCursorPosition = tokenWithCursor.getValue();
+        return tokenWithCursor.getKey();
+    }
+
+    // returns the token and the endIndex (cursor position)
+    public Pair<Token, Integer> getNextToken(int startIndex) {
         Token res = new Token();
         int curState = STARTSTATE;
         int curIndex = startIndex;
