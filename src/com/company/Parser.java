@@ -1,5 +1,7 @@
 package com.company;
 
+import javafx.util.Pair;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,7 @@ public class Parser {
     private String errorFilePath;
     private HashMap<String, ArrayList<String>> firstSets;
     private HashMap<String, ArrayList<String>> followSets;
+    private Lexer lexer;
 
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
@@ -25,6 +28,19 @@ public class Parser {
         initializeFirstSets();
         initializeFollowSets();
         initializeParseTable();
+    }
+
+    public Parser(Lexer lexer){
+        this.lexer = lexer;
+    }
+
+    public void parse(){
+        Token currentToken = null;
+        int cursor = 0;
+        do{
+            currentToken = lexer.getNextToken();
+
+        } while(currentToken.getTokenType() != TokenTypes.EOF);
     }
 
     private void initializeFollowSets() {
