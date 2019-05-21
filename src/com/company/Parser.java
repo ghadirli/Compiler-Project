@@ -12,7 +12,7 @@ public class Parser {
     private String outputFilePath;
     private String errorFilePath;
     private HashMap<String, ArrayList<String>> firstSets;
-    private HashMap<String, String> followSets;
+    private HashMap<String, ArrayList<String>> followSets;
 
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
@@ -28,7 +28,48 @@ public class Parser {
     }
 
     private void initializeFollowSets() {
-
+        followSets.put("PROGRAM", splitWithComma("-|"));
+        followSets.put("DECLARATIONLIST", splitWithComma("eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
+        followSets.put("DECLARATION", splitWithComma("int, void, eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
+        followSets.put("DECLARATION2", splitWithComma("int, void, eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
+        followSets.put("TYPESPECIFIER", splitWithComma("id"));
+        followSets.put("PARAMS", splitWithComma(")"));
+        followSets.put("PARAMS2", splitWithComma(")"));
+        followSets.put("PARAMLIST", splitWithComma(""));
+        followSets.put("PARAMLIST2", splitWithComma(")"));
+        followSets.put("PARAM", splitWithComma(",, )"));
+        followSets.put("PARAM2", splitWithComma(",, )"));
+        followSets.put("COMPOUNDSTMT", splitWithComma("int, void, eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("STATEMENTLIST", splitWithComma("}, case, default"));
+        followSets.put("STATEMENT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("EXPRESSIONSTMT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("SELECTIONSTMT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("ITERATIONSTMT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("RETURNSTMT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("RETURNSTMT2", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("SWITCHSTMT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("CASESTMTS", splitWithComma("default, }"));
+        followSets.put("CASESTMT", splitWithComma("case, default, }"));
+        followSets.put("DEFAULTSTMT", splitWithComma("}"));
+        followSets.put("EXPRESSION", splitWithComma(";, ), ], ,"));
+        followSets.put("EXPRESSION2", splitWithComma(";, ), ], ,"));
+        followSets.put("EXPRESSION3", splitWithComma(";, ), ], ,"));
+        followSets.put("VAR", splitWithComma(""));
+        followSets.put("VAR2", splitWithComma("=, *, +, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("SIMPLEEXPRESSION", splitWithComma(""));
+        followSets.put("SIMPLEEXPRESSION2", splitWithComma(";, ), |, ], ,"));
+        followSets.put("RELOP", splitWithComma("+, -, (, id, num"));
+        followSets.put("ADDITIVEEXPRESSION", splitWithComma("less, ==, ;, ), |, ], ,"));
+        followSets.put("ADDITIVEEXPRESSION2", splitWithComma("less, ==, ;, ), |, ], ,"));
+        followSets.put("ADDOP", splitWithComma("+, -, (, id, num"));
+        followSets.put("TERM", splitWithComma("+, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("TERM2", splitWithComma("+, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("SIGNEDFACTOR", splitWithComma("*, +, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("FACTOR", splitWithComma("*, +, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("FACTOR2", splitWithComma("*, +, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("ARGS", splitWithComma(")"));
+        followSets.put("ARGLIST", splitWithComma(")"));
+        followSets.put("ARGLIST2", splitWithComma(")"));
     }
 
     // automatically generated from web with python, thus this may have no mistakes :)
