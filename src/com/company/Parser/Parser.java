@@ -1,5 +1,8 @@
 package com.company.Parser;
 
+import com.company.Lexer.Lexer;
+import com.company.Lexer.Token;
+import com.company.Lexer.TokenTypes;
 import javafx.util.Pair;
 
 import java.lang.reflect.Array;
