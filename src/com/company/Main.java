@@ -1,5 +1,8 @@
 package com.company;
 
+import com.company.Lexer.Lexer;
+import com.company.Parser.Parser;
+
 public class Main {
 
     public static void main(String[] args) {

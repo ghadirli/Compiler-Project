@@ -1,4 +1,4 @@
-package com.company;
+package com.company.Lexer;
 
 import javafx.util.Pair;
 

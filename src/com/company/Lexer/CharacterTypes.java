@@ -1,4 +1,4 @@
-package com.company;
+package com.company.Lexer;
 
 // check star before symbol
 public enum CharacterTypes {

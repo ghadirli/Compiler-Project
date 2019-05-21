@@ -1,4 +1,4 @@
-package com.company;
+package com.company.Parser;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -116,6 +116,11 @@ public class Parser {
         firstSets.put("ARGS", splitWithComma("epsilon, id, +, -, (, num"));
         firstSets.put("ARGLIST", splitWithComma("id, +, -, (, num"));
         firstSets.put("ARGLIST2", splitWithComma(",, epsilon"));
+    }
+
+    private Boolean isNonTerminal(String production) {
+        return production.charAt(0) <= 90 && production.charAt(0) >= 65;
+
     }
 
     private ArrayList<String> splitWithComma(String str) {

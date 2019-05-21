@@ -1,4 +1,4 @@
-package com.company;
+package com.company.Lexer;
 
 public class Token {
     private String description;
