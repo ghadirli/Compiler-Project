@@ -119,7 +119,7 @@ public class Parser {
     }
 
     private ArrayList<String> splitWithComma(String str) {
-        return (ArrayList<String>) Arrays.asList(str.split(", "));
+        return new ArrayList<String>(Arrays.asList(str.split(", ")));
     }
 
     public void initializeParseTable() {
