@@ -22,6 +22,7 @@ public class Parser {
     private HashMap<String, TransitionTree> transitionTreesSet; // maps the nonTerminals to their transition trees
     private HashMap<String, ArrayList<String>> rules; // maps the nonTerminals to the expressions they can transform
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
+    private final String epsilon = "epsilon";
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
         stack = new Stack<>();
@@ -104,9 +105,13 @@ public class Parser {
             return;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
-            if (isInFirst(neighbor.getValue(), token)) {
-                //TODO complete Soroush
-                //transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
+            if(neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)){
+                transit(nonTerminal, neighbor.getKey(), token); // eventually does nothing because traverses
+                // an epsilon edge and go to end of tree and return from there
+                // but better to be here for comprehensive algorithm
+                return;
+            }
+            if (isInFirst(neighbor.getValue(), token) || (epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token))) {
                 //TODO add condition for epsilon
                 if (isNonTerminal(neighbor.getValue())) {
                     transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
@@ -151,6 +156,10 @@ public class Parser {
                 currentNode = newNode;
             }
         }
+    }
+
+    private boolean isInFollow(String terminalOrNonTerminalName, Token token) {
+        //TODO
     }
 
     // check first, for terminals and nonTerminals
