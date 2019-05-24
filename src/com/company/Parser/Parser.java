@@ -164,9 +164,7 @@ public class Parser {
         if (!isNonTerminal(terminalOrNonTerminalName))
             return false;
         else {
-            if (token.getTokenType() == TokenTypes.ID){
 
-            }
         }
     }
 
