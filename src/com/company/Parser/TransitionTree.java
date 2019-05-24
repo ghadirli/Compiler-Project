@@ -19,4 +19,8 @@ public class TransitionTree {
     public void setCurrentNode(Node currentNode) {
         this.currentNode = currentNode;
     }
+
+    public Node getRoot() {
+        return root;
+    }
 }

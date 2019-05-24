@@ -1,16 +1,13 @@
 package com.company.Parser;
 
-import Utils.Constants;
 import com.company.Lexer.Lexer;
 import com.company.Lexer.Token;
 import com.company.Lexer.TokenTypes;
 import javafx.util.Pair;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -19,12 +16,12 @@ public class Parser {
     private String inputFilePath;
     private String outputFilePath;
     private String errorFilePath;
-    private HashMap<String, ArrayList<String>> firstSets;
-    private HashMap<String, ArrayList<String>> followSets;
+    private HashMap<String, ArrayList<String>> firstSets; // maps the nonTerminals to their first sets
+    private HashMap<String, ArrayList<String>> followSets; // maps the nonTerminals to their follow sets
     private Lexer lexer;
-    private HashMap<String, TransitionTree> transitionTreesSet;
-    private HashMap<String, ArrayList<String>> rules;
-    private String cfgBegin = "PROGRAM";
+    private HashMap<String, TransitionTree> transitionTreesSet; // maps the nonTerminals to their transition trees
+    private HashMap<String, ArrayList<String>> rules; // maps the nonTerminals to the expressions they can transform
+    private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
         stack = new Stack<>();
@@ -67,6 +64,7 @@ public class Parser {
 
     }
 
+    // check can change to string.find() ?
     public int indexOfArrow(String string) {
         for (int i = 0; i < string.length(); i++) {
             if (string.substring(i, i + 3).equals(" ->"))
@@ -82,19 +80,43 @@ public class Parser {
     public void parse() {
         initializeTransitionTrees();
         Token currentToken;
-        int cursor = 0;
-        String currentNonTerminal = cfgBegin;
-        do {
-            currentToken = lexer.getNextToken();
+        //int cursor = 0;
+        //String currentNonTerminal = cfgBegin;
+        currentToken = lexer.getNextToken();
+        transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken);
+
+        /*do {
+            //transit(tra);
             Node curNode = transitionTreesSet.get(currentNonTerminal).getCurrentNode();
             for (Pair<Node, String> neighbor : curNode.getNeighbours()) {
                 if (isInFirst(neighbor.getValue(), currentToken)) {
-                    //TODO complete Soroush
                     transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
                     break;
                 }
             }
-        } while (currentToken.getTokenType() != TokenTypes.EOF);
+        } while (currentToken.getTokenType() != TokenTypes.EOF);*/
+    }
+
+    public void transit(String nonTerminal, Node node, Token token){
+        //Node curNode = transitionTree.getCurrentNode();
+        if(node.isEnd())
+            return;
+
+        for (Pair<Node, String> neighbor : node.getNeighbours()) {
+            if (isInFirst(neighbor.getValue(), token)) {
+                //TODO complete Soroush
+                //transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
+                //TODO add condition for epsilon
+                if(isNonTerminal(neighbor.getValue())){
+                    transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
+                }
+
+                Token nextToken = lexer.getNextToken();
+                transit(nonTerminal, neighbor.getKey(), nextToken);
+
+                break;
+            }
+        }
     }
 
     // for transition trees
@@ -107,6 +129,8 @@ public class Parser {
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
         //TODO
+
+        //TODO transitionTreesSet must map the NonTerminals to their transitionTrees
     }
 
     private void addProductionToTree(TransitionTree transitionTree, String production) {

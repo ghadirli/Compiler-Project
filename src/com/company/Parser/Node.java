@@ -9,6 +9,7 @@ public class Node {
     private static int numOfInstances;
     //TODO change Integer to Node
     private ArrayList<Pair<Node, String>> neighbours;
+    private boolean isEnd = false;
 
     public Node() {
         this.id = numOfInstances;
@@ -25,5 +26,9 @@ public class Node {
 
     public ArrayList<Pair<Node, String>> getNeighbours() {
         return neighbours;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
     }
 }
