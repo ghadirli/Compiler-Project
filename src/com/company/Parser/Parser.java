@@ -114,9 +114,11 @@ public class Parser {
                 Token nextToken = lexer.getNextToken();
                 transit(nonTerminal, neighbor.getKey(), nextToken);
 
-                break;
+                return;
             }
         }
+
+        //TODO input must contain error
     }
 
     // for transition trees
@@ -141,6 +143,10 @@ public class Parser {
     private boolean isInFirst(String terminalOrNonTerminalName, Token token) {
         return true;
         //TODO
+    }
+
+    private boolean epsilonInFirst(String terminalOrNonTerminalName) {
+        return isNonTerminal(terminalOrNonTerminalName) && firstSets.get(terminalOrNonTerminalName).contains("epsilon");
     }
 
     private void initializeFollowSets() {
