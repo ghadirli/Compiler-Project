@@ -6,19 +6,19 @@ public class TransitionTree {
     private Node root;
     private Node terminal;
     private ArrayList<Node> nodes;
-    private Node currentNode;
+    //private Node currentNode;
 
     public ArrayList<Node> getNodes() {
         return nodes;
     }
 
-    public Node getCurrentNode() {
+    /*public Node getCurrentNode() {
         return currentNode;
     }
 
     public void setCurrentNode(Node currentNode) {
         this.currentNode = currentNode;
-    }
+    }*/
 
     public Node getRoot() {
         return root;
