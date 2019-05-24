@@ -105,7 +105,7 @@ public class Parser {
             return;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
-            if(neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)){
+            if (neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)) {
                 transit(nonTerminal, neighbor.getKey(), token); // eventually does nothing because traverses
                 // an epsilon edge and go to end of tree and return from there
                 // but better to be here for comprehensive algorithm
@@ -158,13 +158,21 @@ public class Parser {
         }
     }
 
+    // if terminalOrNonTerminalName is terminal, we return false
     private boolean isInFollow(String terminalOrNonTerminalName, Token token) {
         //TODO
+        if (!isNonTerminal(terminalOrNonTerminalName))
+            return false;
+        else {
+            if (token.getTokenType() == TokenTypes.ID){
+
+            }
+        }
     }
 
     // check first, for terminals and nonTerminals
     private boolean isInFirst(String terminalOrNonTerminalName, Token token) {
-        return true;
+
         //TODO
     }
 
@@ -200,18 +208,18 @@ public class Parser {
         followSets.put("EXPRESSION2", splitWithComma(";, ), ], ,"));
         followSets.put("EXPRESSION3", splitWithComma(";, ), ], ,"));
         followSets.put("VAR", splitWithComma(""));
-        followSets.put("VAR2", splitWithComma("=, *, +, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("VAR2", splitWithComma("=, *, +, -, <;, ==, ;, ), ], ,"));
         followSets.put("SIMPLEEXPRESSION", splitWithComma(""));
-        followSets.put("SIMPLEEXPRESSION2", splitWithComma(";, ), |, ], ,"));
+        followSets.put("SIMPLEEXPRESSION2", splitWithComma(";, ), ], ,"));
         followSets.put("RELOP", splitWithComma("+, -, (, id, num"));
-        followSets.put("ADDITIVEEXPRESSION", splitWithComma("less, ==, ;, ), |, ], ,"));
-        followSets.put("ADDITIVEEXPRESSION2", splitWithComma("less, ==, ;, ), |, ], ,"));
+        followSets.put("ADDITIVEEXPRESSION", splitWithComma("<;, ==, ;, ), ], ,"));
+        followSets.put("ADDITIVEEXPRESSION2", splitWithComma("<;, ==, ;, ), ], ,"));
         followSets.put("ADDOP", splitWithComma("+, -, (, id, num"));
-        followSets.put("TERM", splitWithComma("+, -, less, ==, ;, ), |, ], ,"));
-        followSets.put("TERM2", splitWithComma("+, -, less, ==, ;, ), |, ], ,"));
-        followSets.put("SIGNEDFACTOR", splitWithComma("*, +, -, less, ==, ;, ), |, ], ,"));
-        followSets.put("FACTOR", splitWithComma("*, +, -, less, ==, ;, ), |, ], ,"));
-        followSets.put("FACTOR2", splitWithComma("*, +, -, less, ==, ;, ), |, ], ,"));
+        followSets.put("TERM", splitWithComma("+, -, <;, ==, ;, ), ], ,"));
+        followSets.put("TERM2", splitWithComma("+, -, <;, ==, ;, ), ], ,"));
+        followSets.put("SIGNEDFACTOR", splitWithComma("*, +, -, <;, ==, ;, ), ], ,"));
+        followSets.put("FACTOR", splitWithComma("*, +, -, <;, ==, ;, ), ], ,"));
+        followSets.put("FACTOR2", splitWithComma("*, +, -, <;, ==, ;, ), ], ,"));
         followSets.put("ARGS", splitWithComma(")"));
         followSets.put("ARGLIST", splitWithComma(")"));
         followSets.put("ARGLIST2", splitWithComma(")"));
@@ -225,7 +233,7 @@ public class Parser {
         firstSets.put("DECLARATION2", splitWithComma(";, [, ("));
         firstSets.put("TYPESPECIFIER", splitWithComma("int, void"));
         firstSets.put("PARAMS", splitWithComma("int, void"));
-        firstSets.put("KPARAMS2", splitWithComma("id"));
+        firstSets.put("PARAMS2", splitWithComma("id"));
         firstSets.put("PARAMLIST", splitWithComma("int, void"));
         firstSets.put("PARAMLIST2", splitWithComma(",, epsilon"));
         firstSets.put("PARAM", splitWithComma("int, void"));
@@ -243,13 +251,13 @@ public class Parser {
         firstSets.put("CASESTMT", splitWithComma("case"));
         firstSets.put("DEFAULTSTMT", splitWithComma("default, epsilon"));
         firstSets.put("EXPRESSION", splitWithComma("id, +, -, (, num"));
-        firstSets.put("EXPRESSION2", splitWithComma("("));
-        firstSets.put("EXPRESSION3", splitWithComma("=, *, epsilon, +, -, less, =="));
+        firstSets.put("EXPRESSION2", splitWithComma("(, [, =, *, epsilon, +, -, &lt;, =="));
+        firstSets.put("EXPRESSION3", splitWithComma("=, *, epsilon, +, -, &lt;, =="));
         firstSets.put("VAR", splitWithComma("id"));
         firstSets.put("VAR2", splitWithComma("[, epsilon"));
         firstSets.put("SIMPLEEXPRESSION", splitWithComma("+, -, (, id, num"));
-        firstSets.put("SIMPLEEXPRESSION2", splitWithComma("epsilon, less, =="));
-        firstSets.put("RELOP", splitWithComma("less, =="));
+        firstSets.put("SIMPLEEXPRESSION2", splitWithComma("epsilon, &lt;, =="));
+        firstSets.put("RELOP", splitWithComma("&lt;, =="));
         firstSets.put("ADDITIVEEXPRESSION", splitWithComma("+, -, (, id, num"));
         firstSets.put("ADDITIVEEXPRESSION2", splitWithComma("epsilon, +, -"));
         firstSets.put("ADDOP", splitWithComma("+, -"));
