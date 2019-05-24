@@ -12,8 +12,13 @@ public class Node {
     private boolean isEnd = false;
 
     public Node() {
+        neighbours = new ArrayList<>();
         this.id = numOfInstances;
         numOfInstances++;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public Node(ArrayList<Pair<Node, String>> neighbours) {
@@ -22,6 +27,10 @@ public class Node {
 
     public void addToNeighbours(Node node, String edge) {
         neighbours.add(new Pair<>(node, edge));
+    }
+
+    public void setEnd(boolean end) {
+        isEnd = end;
     }
 
     public ArrayList<Pair<Node, String>> getNeighbours() {

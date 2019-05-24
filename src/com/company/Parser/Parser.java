@@ -36,6 +36,7 @@ public class Parser {
         initializeParseTable();
     }
 
+    // read line by line from file and initializes rules.
     private void initializeRules() {
         BufferedReader reader;
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company";
@@ -97,9 +98,9 @@ public class Parser {
         } while (currentToken.getTokenType() != TokenTypes.EOF);*/
     }
 
-    public void transit(String nonTerminal, Node node, Token token){
+    public void transit(String nonTerminal, Node node, Token token) {
         //Node curNode = transitionTree.getCurrentNode();
-        if(node.isEnd())
+        if (node.isEnd())
             return;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
@@ -107,7 +108,7 @@ public class Parser {
                 //TODO complete Soroush
                 //transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
                 //TODO add condition for epsilon
-                if(isNonTerminal(neighbor.getValue())){
+                if (isNonTerminal(neighbor.getValue())) {
                     transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
                 }
 
@@ -128,13 +129,25 @@ public class Parser {
             }
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
-        //TODO
 
         //TODO transitionTreesSet must map the NonTerminals to their transitionTrees
     }
 
     private void addProductionToTree(TransitionTree transitionTree, String production) {
-        //TODO
+        String[] stringsOfProduction = production.split("\\s+");
+        Node terminal = transitionTree.getTerminal();
+        Node start = transitionTree.getRoot();
+        if (stringsOfProduction.length == 1)
+            start.addToNeighbours(terminal, stringsOfProduction[0]);
+        else {
+            Node currentNode = start;
+            for (int i = 0; i < stringsOfProduction.length - 1; i++) {
+                Node newNode = new Node();
+                transitionTree.addToNodes(newNode);
+                currentNode.addToNeighbours(newNode, stringsOfProduction[i]);
+                currentNode = newNode;
+            }
+        }
     }
 
     // check first, for terminals and nonTerminals

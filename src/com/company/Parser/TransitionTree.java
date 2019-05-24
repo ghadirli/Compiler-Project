@@ -12,6 +12,20 @@ public class TransitionTree {
         return nodes;
     }
 
+    public void addToNodes(Node node){
+        nodes.add(node);
+    }
+    public TransitionTree() {
+        root = new Node();
+        nodes = new ArrayList<>();
+        terminal = new Node();
+        terminal.setEnd(true);
+    }
+
+    public Node getTerminal() {
+        return terminal;
+    }
+
     public Node getCurrentNode() {
         return currentNode;
     }
