@@ -23,6 +23,7 @@ public class Parser {
     private HashMap<String, ArrayList<String>> rules; // maps the nonTerminals to the expressions they can transform
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
+    private ErrorLogger errorLogger;
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
         stack = new Stack<>();
@@ -35,6 +36,13 @@ public class Parser {
         initializeFollowSets();
         initializeRules();
         initializeParseTable();
+        errorLogger = new ErrorLogger(errorFilePath);
+    }
+
+    public Parser(Lexer lexer, String errorFilePath) {
+        this.lexer = lexer;
+        this.errorFilePath = errorFilePath;
+        errorLogger = new ErrorLogger(errorFilePath);
     }
 
     // read line by line from file and initializes rules.
@@ -68,15 +76,11 @@ public class Parser {
 
     // check can change to string.find() ?
     public int indexOfArrow(String string) {
-        for (int i = 0; i < string.length(); i++) {
+        for (int i = 0; i < string.length() - 3; i++) {
             if (string.substring(i, i + 3).equals(" ->"))
                 return i;
         }
         return 0;
-    }
-
-    public Parser(Lexer lexer) {
-        this.lexer = lexer;
     }
 
     public void parse() {
@@ -99,6 +103,7 @@ public class Parser {
         } while (currentToken.getTokenType() != TokenTypes.EOF);*/
     }
 
+    // TODO handle and skip whenever token type is error (and comment)
     public void transit(String nonTerminal, Node node, Token token) {
         //Node curNode = transitionTree.getCurrentNode();
         if (node.isEnd())
@@ -112,7 +117,6 @@ public class Parser {
                 return;
             }
             if (isInFirst(neighbor.getValue(), token) || (epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token))) {
-                //TODO add condition for epsilon
                 if (isNonTerminal(neighbor.getValue())) {
                     transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
                 }
@@ -124,7 +128,14 @@ public class Parser {
             }
         }
 
-        //TODO input must contain error
+        // TODO input must contain error
+        // and it should be in a node with out degree = 1
+        Pair<Node, String> neighbor = node.getNeighbours().get(0);
+        if(!isNonTerminal(neighbor.getValue())){
+            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + node.getNeighbours().get(0).getValue());
+            transit(nonTerminal, neighbor.getKey(), lexer.getNextToken());
+            return;
+        }
     }
 
     // for transition trees
@@ -166,11 +177,12 @@ public class Parser {
         else {
 
         }
+        return true;
     }
 
     // check first, for terminals and nonTerminals
     private boolean isInFirst(String terminalOrNonTerminalName, Token token) {
-
+        return true;
         //TODO
     }
 
