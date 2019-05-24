@@ -8,22 +8,22 @@ public class Node {
     private Integer id;
     private static int numOfInstances;
     //TODO change Integer to Node
-    private ArrayList<Pair<Integer, String>> neighbours;
+    private ArrayList<Pair<Node, String>> neighbours;
 
     public Node() {
         this.id = numOfInstances;
         numOfInstances++;
     }
 
-    public Node(ArrayList<Pair<Integer, String>> neighbours) {
+    public Node(ArrayList<Pair<Node, String>> neighbours) {
         this.neighbours = neighbours;
     }
 
-    public void addToNeighbours(Integer node_number, String edge) {
-        neighbours.add(new Pair<>(node_number, edge));
+    public void addToNeighbours(Node node, String edge) {
+        neighbours.add(new Pair<>(node, edge));
     }
 
-    public ArrayList<Pair<Integer, String>> getNeighbours() {
+    public ArrayList<Pair<Node, String>> getNeighbours() {
         return neighbours;
     }
 }

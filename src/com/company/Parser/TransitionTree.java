@@ -3,6 +3,7 @@ package com.company.Parser;
 import java.util.ArrayList;
 
 public class TransitionTree {
+    private Node root;
     private ArrayList<Node> nodes;
     private Node currentNode;
 

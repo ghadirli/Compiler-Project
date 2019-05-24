@@ -1,15 +1,18 @@
 package com.company.Parser;
 
+import Utils.Constants;
 import com.company.Lexer.Lexer;
 import com.company.Lexer.Token;
 import com.company.Lexer.TokenTypes;
 import javafx.util.Pair;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
+
 
 public class Parser {
     private Stack<String> stack;
@@ -20,6 +23,7 @@ public class Parser {
     private HashMap<String, ArrayList<String>> followSets;
     private Lexer lexer;
     private HashMap<String, TransitionTree> transitionTreesSet;
+    private HashMap<String, ArrayList<String>> rules;
     private String cfgBegin = "PROGRAM";
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
@@ -31,38 +35,87 @@ public class Parser {
         this.errorFilePath = errorFilePath;
         initializeFirstSets();
         initializeFollowSets();
+        initializeRules();
         initializeParseTable();
     }
 
-    public Parser(Lexer lexer){
+    private void initializeRules() {
+        BufferedReader reader;
+        String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company";
+        String grammar = sampleInputDirectory + "/Utils/CFG_grammar_one_per_line";
+        try {
+            reader = new BufferedReader(new FileReader(grammar));
+            String line = reader.readLine();
+            while (line != null) {
+                System.out.println(line);
+                int arrowIndex = indexOfArrow(line);
+                String left = line.substring(0, arrowIndex);
+                String right = line.substring(arrowIndex + 4);
+                if (rules.containsKey(left))
+                    rules.get(left).add(right);
+                else {
+                    ArrayList<String> arr = new ArrayList<>();
+                    arr.add(right);
+                    rules.put(left, arr);
+                }
+
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public int indexOfArrow(String string) {
+        for (int i = 0; i < string.length(); i++) {
+            if (string.substring(i, i + 3).equals(" ->"))
+                return i;
+        }
+        return 0;
+    }
+
+    public Parser(Lexer lexer) {
         this.lexer = lexer;
     }
 
-    public void parse(){
+    public void parse() {
         initializeTransitionTrees();
         Token currentToken;
         int cursor = 0;
         String currentNonTerminal = cfgBegin;
-        do{
+        do {
             currentToken = lexer.getNextToken();
             Node curNode = transitionTreesSet.get(currentNonTerminal).getCurrentNode();
-            for(Pair<Node, String> neighbor : curNode.getNeighbours()){
-                if(isInFirst(neighbor.getValue(), currentToken)){
+            for (Pair<Node, String> neighbor : curNode.getNeighbours()) {
+                if (isInFirst(neighbor.getValue(), currentToken)) {
                     //TODO complete Soroush
                     transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
                     break;
                 }
             }
-        } while(currentToken.getTokenType() != TokenTypes.EOF);
+        } while (currentToken.getTokenType() != TokenTypes.EOF);
     }
 
     // for transition trees
-    private void initializeTransitionTrees(){
+    private void initializeTransitionTrees() {
+        for (Map.Entry<String, ArrayList<String>> entry : rules.entrySet()) {
+            TransitionTree transitionTree = new TransitionTree();
+            for (int i = 0; i < entry.getValue().size(); i++) {
+                addProductionToTree(transitionTree, entry.getValue().get(i));
+            }
+            transitionTreesSet.put(entry.getKey(), transitionTree);
+        }
         //TODO
     }
 
+    private void addProductionToTree(TransitionTree transitionTree, String production) {
+
+    }
+
     // check first, for terminals and nonTerminals
-    private boolean isInFirst(String terminalOrNonTerminalName, Token token){
+    private boolean isInFirst(String terminalOrNonTerminalName, Token token) {
+        return true;
         //TODO
     }
 
