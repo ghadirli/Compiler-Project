@@ -132,6 +132,7 @@ public class Parser {
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
 
+
         //TODO transitionTreesSet must map the NonTerminals to their transitionTrees
     }
 
