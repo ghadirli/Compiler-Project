@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class TransitionTree {
     private Node root;
+    private Node terminal;
     private ArrayList<Node> nodes;
     private Node currentNode;
 
