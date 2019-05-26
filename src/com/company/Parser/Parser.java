@@ -4,10 +4,12 @@ import com.company.Lexer.Lexer;
 import com.company.Lexer.Token;
 import com.company.Lexer.TokenTypes;
 import javafx.util.Pair;
+import jdk.nashorn.internal.parser.TokenType;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -16,6 +18,9 @@ public class Parser {
     private String inputFilePath;
     private String outputFilePath;
     private String errorFilePath;
+    private ArrayList<String> keywordsList = new ArrayList<>();
+    private ArrayList<String> symbolsList = new ArrayList<>();
+    private ArrayList<Character> whiteSpaceList = new ArrayList<>();
     private HashMap<String, ArrayList<String>> firstSets; // maps the nonTerminals to their first sets
     private HashMap<String, ArrayList<String>> followSets; // maps the nonTerminals to their follow sets
     private Lexer lexer;
@@ -43,6 +48,9 @@ public class Parser {
         this.lexer = lexer;
         this.errorFilePath = errorFilePath;
         errorLogger = new ErrorLogger(errorFilePath);
+        keywordsList = lexer.getKeywordsList();
+        symbolsList = lexer.getSymbolsList();
+        whiteSpaceList = lexer.getWhiteSpaceList();
     }
 
     // read line by line from file and initializes rules.
@@ -131,7 +139,7 @@ public class Parser {
         // TODO input must contain error
         // and it should be in a node with out degree = 1
         Pair<Node, String> neighbor = node.getNeighbours().get(0);
-        if(!isNonTerminal(neighbor.getValue())){
+        if (!isNonTerminal(neighbor.getValue())) {
             errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + node.getNeighbours().get(0).getValue());
             transit(nonTerminal, neighbor.getKey(), lexer.getNextToken());
             return;
@@ -171,19 +179,42 @@ public class Parser {
 
     // if terminalOrNonTerminalName is terminal, we return false
     private boolean isInFollow(String terminalOrNonTerminalName, Token token) {
-        //TODO
         if (!isNonTerminal(terminalOrNonTerminalName))
             return false;
         else {
+            return checkIsInSet(token, followSets.get(terminalOrNonTerminalName));
 
         }
-        return true;
     }
 
     // check first, for terminals and nonTerminals
     private boolean isInFirst(String terminalOrNonTerminalName, Token token) {
-        return true;
-        //TODO
+        if (!isNonTerminal(terminalOrNonTerminalName)) {
+            return terminalOrNonTerminalName.equals(token.getDescription());
+        } else {
+            return checkIsInSet(token, firstSets.get(terminalOrNonTerminalName));
+        }
+    }
+
+    private boolean checkIsInSet(Token token, ArrayList arr) {
+        if (token.getTokenType() == TokenTypes.ID)
+            return arr.contains("id");
+        else if (token.getTokenType() == TokenTypes.NUM)
+            return arr.contains("num");
+        else if (token.getTokenType() == TokenTypes.EOF)
+            return arr.contains("eof");
+        else if (token.getTokenType() == TokenTypes.KEYWORD)
+            for (String s : keywordsList) {
+                if (token.getDescription().equals(s))
+                    return arr.contains(s);
+            }
+        else if (token.getTokenType() == TokenTypes.SYMBOL)
+            for (String s : symbolsList) {
+                if (token.getDescription().equals(s))
+                    return arr.contains(s);
+            }
+
+        return false;
     }
 
     private boolean epsilonInFirst(String terminalOrNonTerminalName) {

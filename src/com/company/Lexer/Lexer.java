@@ -34,6 +34,7 @@ public class Lexer {
     private int lastCursorPosition = 0;
 
 
+
     public Lexer(String inputFilePath, String outputFilePath, String errorFilePath) {
         this.inputFilePath = inputFilePath;
         this.input = readInputFromFile(inputFilePath) + '\n' + ' ';
@@ -353,6 +354,10 @@ public class Lexer {
         }
         return sb.toString();
 
+    }
+
+    public ArrayList<Character> getWhiteSpaceList() {
+        return whiteSpaceList;
     }
 
     private void initializeAcceptedStates() {
