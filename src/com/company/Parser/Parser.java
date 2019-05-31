@@ -4,12 +4,10 @@ import com.company.Lexer.Lexer;
 import com.company.Lexer.Token;
 import com.company.Lexer.TokenTypes;
 import javafx.util.Pair;
-import jdk.nashorn.internal.parser.TokenType;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -112,35 +110,37 @@ public class Parser {
     }
 
     // TODO handle and skip whenever token type is error (and comment)
-    public void transit(String nonTerminal, Node node, Token token) {
+    // transits the transition diagram of the nonTerminal from the node given to the end of that diagram and
+    // returns the next token that hasn't been transited
+    public Token transit(String nonTerminal, Node node, Token token) {
         //Node curNode = transitionTree.getCurrentNode();
         if (node.isEnd())
-            return;
+            return token;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
             if (neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)) {
-                transit(nonTerminal, neighbor.getKey(), token); // eventually does nothing because traverses
+                return transit(nonTerminal, neighbor.getKey(), token); // eventually does nothing because traverses
                 // an epsilon edge and go to end of tree and return from there
                 // but better to be here for comprehensive algorithm
-                return;
             }
-            if (isInFirst(neighbor.getValue(), token) || (epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token))) {
+            if (isInFirst(neighbor.getValue(), token)) {
                 if (isNonTerminal(neighbor.getValue())) {
-                    transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
+                    token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
+                } else {
+                    token = lexer.getNextToken();
                 }
-
-                Token nextToken = lexer.getNextToken();
-                transit(nonTerminal, neighbor.getKey(), nextToken);
-
-                return;
+                return transit(nonTerminal, neighbor.getKey(), token);
+            } else if(epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token)){
+                token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
+                return transit(nonTerminal, neighbor.getKey(), token);
             }
         }
 
         // TODO input must contain error
         // and it should be in a node with out degree = 1
         Pair<Node, String> neighbor = node.getNeighbours().get(0);
-        if (!isNonTerminal(neighbor.getValue())) {
-            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + node.getNeighbours().get(0).getValue());
+        if(!isNonTerminal(neighbor.getValue())){
+            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
             transit(nonTerminal, neighbor.getKey(), lexer.getNextToken());
             return;
         }
