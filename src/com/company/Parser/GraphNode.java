@@ -16,6 +16,10 @@ public class GraphNode {
 //        this(label)
 //    }
 
+    public ArrayList<GraphNode> getChildren() {
+        return children;
+    }
+
     public String getLabel() {
         return label;
     }

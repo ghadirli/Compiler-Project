@@ -29,6 +29,7 @@ public class Parser {
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
     private Logger logger;
+    private Logger errorLogger;
     private HashMap<String, String> description = new HashMap<>();
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
@@ -41,13 +42,15 @@ public class Parser {
         initializeFirstSets();
         initializeFollowSets();
         initializeRules();
-        logger = new Logger(errorFilePath);
+        logger = new Logger(outputFilePath);
+        errorLogger = new Logger(errorFilePath);
     }
 
-    public Parser(Lexer lexer, String errorFilePath) {
+    public Parser(Lexer lexer, String outputFilePath, String errorFilePath) {
         this.lexer = lexer;
         this.errorFilePath = errorFilePath;
-        logger = new Logger(errorFilePath);
+        logger = new Logger(outputFilePath);
+        errorLogger = new Logger(errorFilePath);
         keywordsList = lexer.getKeywordsList();
         symbolsList = lexer.getSymbolsList();
         whiteSpaceList = lexer.getWhiteSpaceList();
@@ -99,34 +102,28 @@ public class Parser {
         currentToken = lexer.getNextToken();
         GraphNode root = new GraphNode(cfgBegin, 0);
         transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken, root);
-
-
-        /*do {
-            //transit(tra);
-            Node curNode = transitionTreesSet.get(currentNonTerminal).getCurrentNode();
-            for (Pair<Node, String> neighbor : curNode.getNeighbours()) {
-                if (isInFirst(neighbor.getValue(), currentToken)) {
-                    transitionTreesSet.get(currentNonTerminal).setCurrentNode(neighbor.getKey());
-                    break;
-                }
-            }
-        } while (currentToken.getTokenType() != TokenTypes.EOF);*/
+        dfsAndPrint(root);
     }
 
     private void dfsAndPrint(GraphNode graphNode){
         for(int i=0; i<graphNode.getDepth(); i++){
-            System.out.println("|   ");
+            logger.log("|   ");
         }
-        System.out.println();
+        logger.log(graphNode.getLabel());
+        for(GraphNode graphNode1 : graphNode.getChildren()) {
+            dfsAndPrint(graphNode1);
+        }
     }
 
-    // TODO handle and skip whenever token type is error (and comment)
+    // handle and skip whenever token type is error (and comment)
     // transits the transition diagram of the nonTerminal from the node given to the end of that diagram and
     // returns the next token that hasn't been transited
     // graphNode is the node for parse tree
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
-        //Node curNode = transitionTree.getCurrentNode();
+        if(token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR ){
+            return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
+        }
         if (node.isEnd())
             return token;
 
@@ -162,20 +159,21 @@ public class Parser {
         Pair<Node, String> neighbor = node.getNeighbours().get(0);
         // for assertion
         assertByMessage(node.getNeighbours().size() <= 1, "Wrong assumption of neighbor size! it's more than one.");
+        //TODO EOF not handled
         if (isEOF(neighbor.getValue())) {
-            logger.log(token.getLineNumber() + ": Syntax Error! Malformed Input.");
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Malformed Input.");
             return null; // TODO check
         }
         if (!isNonTerminal(neighbor.getValue())) {
-            logger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
             return transit(nonTerminal, neighbor.getKey(), token, graphNode);
         }
         if (!isInFirst(neighbor.getValue(), token) && !isInFollow(neighbor.getValue(), token)) {
-            logger.log(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         assertByMessage(isInFollow(neighbor.getValue(), token) && !epsilonInFirst(neighbor.getValue()));
-        logger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
+        errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
         return transit(nonTerminal, neighbor.getKey(), token, graphNode);
     }
 
