@@ -130,6 +130,7 @@ public class Parser {
     // graphNode is the node for parse tree
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
+        System.out.println(token.getDescription());
         if (token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR) {
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
@@ -137,6 +138,11 @@ public class Parser {
             return token;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
+//            System.out.println("######");
+//            System.out.println(neighbor.getValue());
+//            System.out.println(nonTerminal);
+//            System.out.println(token.getTokenType() + " " + token.getDescription());
+//            System.out.println(isInFollow(nonTerminal, token));
             if (neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)) {
                 GraphNode curGraphNode = new GraphNode(epsilon, graphNode.getDepth() + 1);
                 graphNode.addChild(curGraphNode);
@@ -240,6 +246,7 @@ public class Parser {
 
     // if terminalOrNonTerminalName is terminal, we return false
     private boolean isInFollow(String terminalOrNonTerminalName, Token token) {
+
         if (!isNonTerminal(terminalOrNonTerminalName))
             return false;
         else {
