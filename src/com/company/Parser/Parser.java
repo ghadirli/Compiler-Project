@@ -161,7 +161,9 @@ public class Parser {
     }
 
     private boolean isEOF(String terminalOrNonTerminalName) {
-        //TODO
+        if(isNonTerminal(terminalOrNonTerminalName))
+            return false;
+        else return terminalOrNonTerminalName.equals("eof");
     }
 
     // for transition trees
@@ -344,9 +346,9 @@ public class Parser {
         description.put("TYPESPECIFIER", "type of specifier");
         description.put("FACTOR2", "util for factor ");
         description.put("SIGNEDFACTOR", " signed factor");
-        description.put("TERM", "");
-        description.put("PARAM", "");
-        description.put("PARAMS2", "");
+        description.put("TERM", "term ");
+        description.put("PARAM", "parameter");
+        description.put("PARAMS2", "util for parameter");
         description.put("EXPRESSION3", "");
         description.put("ARGS", "");
         description.put("PARAMLIST2", "");
