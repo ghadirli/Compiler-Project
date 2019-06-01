@@ -14,37 +14,24 @@ import static com.company.Parser.Logger.assertByMessage;
 
 
 public class Parser {
-    private Stack<String> stack;
     private String inputFilePath;
     private String outputFilePath;
     private String errorFilePath;
     private ArrayList<String> keywordsList = new ArrayList<>();
     private ArrayList<String> symbolsList = new ArrayList<>();
     private ArrayList<Character> whiteSpaceList = new ArrayList<>();
-    private HashMap<String, ArrayList<String>> firstSets; // maps the nonTerminals to their first sets
-    private HashMap<String, ArrayList<String>> followSets; // maps the nonTerminals to their follow sets
+    private HashMap<String, ArrayList<String>> firstSets = new HashMap<>(); // maps the nonTerminals to their first sets
+    private HashMap<String, ArrayList<String>> followSets = new HashMap<>(); // maps the nonTerminals to their follow sets
     private Lexer lexer;
     private HashMap<String, TransitionTree> transitionTreesSet = new HashMap<>(); // maps the nonTerminals to their transition trees
-    private HashMap<String, ArrayList<String>> rules; // maps the nonTerminals to the expressions they can transform
+    private HashMap<String, ArrayList<String>> rules = new HashMap<>(); // maps the nonTerminals to the expressions they can transform
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
     private Logger logger;
     private Logger errorLogger;
     private HashMap<String, String> description = new HashMap<>();
 
-    public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
-        stack = new Stack<>();
-        firstSets = new HashMap<>();
-        followSets = new HashMap<>();
-        this.inputFilePath = inputFilePath;
-        this.outputFilePath = outputFilePath;
-        this.errorFilePath = errorFilePath;
-        initializeFirstSets();
-        initializeFollowSets();
-        initializeRules();
-        logger = new Logger(outputFilePath);
-        errorLogger = new Logger(errorFilePath);
-    }
+
 
     public Parser(Lexer lexer, String outputFilePath, String errorFilePath) {
         this.lexer = lexer;
@@ -54,7 +41,10 @@ public class Parser {
         keywordsList = lexer.getKeywordsList();
         symbolsList = lexer.getSymbolsList();
         whiteSpaceList = lexer.getWhiteSpaceList();
-        rules = new HashMap<>();
+        initializeRules();
+        initializeFirstSets();
+        initializeFollowSets();
+
     }
 
     // read line by line from file and initializes rules.
@@ -110,12 +100,12 @@ public class Parser {
         dfsAndPrint(root);
     }
 
-    private void dfsAndPrint(GraphNode graphNode){
-        for(int i=0; i<graphNode.getDepth(); i++){
+    private void dfsAndPrint(GraphNode graphNode) {
+        for (int i = 0; i < graphNode.getDepth(); i++) {
             logger.log("|   ");
         }
         logger.log(graphNode.getLabel());
-        for(GraphNode graphNode1 : graphNode.getChildren()) {
+        for (GraphNode graphNode1 : graphNode.getChildren()) {
             dfsAndPrint(graphNode1);
         }
     }
@@ -126,7 +116,7 @@ public class Parser {
     // graphNode is the node for parse tree
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
-        if(token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR ){
+        if (token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR) {
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         if (node.isEnd())
@@ -183,7 +173,7 @@ public class Parser {
     }
 
     private boolean isEOF(String terminalOrNonTerminalName) {
-        if(isNonTerminal(terminalOrNonTerminalName))
+        if (isNonTerminal(terminalOrNonTerminalName))
             return false;
         else return terminalOrNonTerminalName.equals("eof");
     }
@@ -191,10 +181,12 @@ public class Parser {
     // for transition trees
     private void initializeTransitionTrees() {
         for (Map.Entry<String, ArrayList<String>> entry : rules.entrySet()) {
+            System.out.println(entry);
             TransitionTree transitionTree = new TransitionTree();
             for (int i = 0; i < entry.getValue().size(); i++) {
                 addProductionToTree(transitionTree, entry.getValue().get(i));
             }
+            System.out.println(entry.getKey() + transitionTree);
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
 
