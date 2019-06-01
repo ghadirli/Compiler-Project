@@ -92,9 +92,9 @@ public class Parser {
         //String currentNonTerminal = cfgBegin;
         currentToken = lexer.getNextToken();
         GraphNode root = new GraphNode(cfgBegin, 0);
-        System.out.println(transitionTreesSet);
-        System.out.println(transitionTreesSet.get(cfgBegin));
-        System.out.println(transitionTreesSet.get(cfgBegin).getRoot());
+//        System.out.println(transitionTreesSet);
+//        System.out.println(transitionTreesSet.get(cfgBegin));
+//        System.out.println(transitionTreesSet.get(cfgBegin).getRoot());
 
         transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken, root);
         dfsAndPrint(root);

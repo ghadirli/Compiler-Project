@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class GraphNode {
     private String label;
     private Integer depth = 0;
-    private ArrayList<GraphNode> children;
+    private ArrayList<GraphNode> children = new ArrayList<>();
 
     public GraphNode(String label, Integer depth) {
         this.label = label;
