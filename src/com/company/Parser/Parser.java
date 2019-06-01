@@ -24,7 +24,7 @@ public class Parser {
     private HashMap<String, ArrayList<String>> firstSets; // maps the nonTerminals to their first sets
     private HashMap<String, ArrayList<String>> followSets; // maps the nonTerminals to their follow sets
     private Lexer lexer;
-    private HashMap<String, TransitionTree> transitionTreesSet; // maps the nonTerminals to their transition trees
+    private HashMap<String, TransitionTree> transitionTreesSet = new HashMap<>(); // maps the nonTerminals to their transition trees
     private HashMap<String, ArrayList<String>> rules; // maps the nonTerminals to the expressions they can transform
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
@@ -54,6 +54,7 @@ public class Parser {
         keywordsList = lexer.getKeywordsList();
         symbolsList = lexer.getSymbolsList();
         whiteSpaceList = lexer.getWhiteSpaceList();
+        rules = new HashMap<>();
     }
 
     // read line by line from file and initializes rules.
@@ -101,6 +102,10 @@ public class Parser {
         //String currentNonTerminal = cfgBegin;
         currentToken = lexer.getNextToken();
         GraphNode root = new GraphNode(cfgBegin, 0);
+        System.out.println(transitionTreesSet);
+        System.out.println(transitionTreesSet.get(cfgBegin));
+        System.out.println(transitionTreesSet.get(cfgBegin).getRoot());
+
         transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken, root);
         dfsAndPrint(root);
     }
