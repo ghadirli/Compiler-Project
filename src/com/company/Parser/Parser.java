@@ -84,9 +84,21 @@ public class Parser {
         return 0;
     }
 
+
+    public void printTransitionTrees() {
+        for (Map.Entry<String, TransitionTree> entry : transitionTreesSet.entrySet()) {
+            System.out.println("@@@@@@@@@@@@@@@@");
+            System.out.println(entry.getKey() + " now is our transition tree");
+            dfsTransitionTree(entry.getValue().getRoot());
+
+
+            System.out.println("###########\n\n");
+        }
+    }
+
     public void parse() {
         initializeTransitionTrees();
-        printTransitionTree(transitionTreesSet.get("PARAMS"));
+        printTransitionTrees();
         Token currentToken;
         //int cursor = 0;
         //String currentNonTerminal = cfgBegin;
@@ -187,7 +199,7 @@ public class Parser {
                 addProductionToTree(transitionTree, entry.getValue().get(i));
             }
 //            System.out.print(entry.getKey() + "    and you are very     " );
-//            printTransitionTree(transitionTree);
+//            dfsTransitionTree(transitionTree);
 
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
@@ -195,12 +207,14 @@ public class Parser {
 
     }
 
-    private void printTransitionTree(TransitionTree transitionTree) {
-        for (int i = 0; i < transitionTree.getRoot().getNeighbours().size(); i++) {
-            System.out.print(transitionTree.getRoot().getNeighbours().get(i).getValue() + " ");
+    private void dfsTransitionTree(Node currentNode) {
+//        System.out.println(currentNode);
+        for (Pair<Node, String> neighbour : currentNode.getNeighbours()) {
+            System.out.println(neighbour.getValue());
+            dfsTransitionTree(neighbour.getKey());
         }
-//        for(Pair<Node, String> neighbor : transitionTree.getRoot())
-        System.out.println();
+
+
     }
 
     private void addProductionToTree(TransitionTree transitionTree, String production) {
