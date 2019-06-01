@@ -1,4 +1,4 @@
-int b
+int b;
 int foo(int d, int e){
 	int f;
 	void foo2(int k[]) {
@@ -26,7 +26,7 @@ void main(void){
 	a = -3 + +11;
 	b = 5 * a + foo(a, a);
 	arr[1] = b + -3;
-	arr[2] = foo(arr[0], arr[1])
+	arr[2] = foo(arr[0], arr[1]);
 	if (b /* comment2 */ == 3){
 		arr[0] = -7;
 	}
