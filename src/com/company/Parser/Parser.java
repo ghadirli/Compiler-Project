@@ -130,7 +130,7 @@ public class Parser {
                     token = lexer.getNextToken();
                 }
                 return transit(nonTerminal, neighbor.getKey(), token);
-            } else if(epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token)){
+            } else if (epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token)) {
                 token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
                 return transit(nonTerminal, neighbor.getKey(), token);
             }
@@ -139,7 +139,7 @@ public class Parser {
         // TODO input must contain error
         // and it should be in a node with out degree = 1
         Pair<Node, String> neighbor = node.getNeighbours().get(0);
-        if(!isNonTerminal(neighbor.getValue())){
+        if (!isNonTerminal(neighbor.getValue())) {
             errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
             transit(nonTerminal, neighbor.getKey(), lexer.getNextToken());
             return;
@@ -157,7 +157,6 @@ public class Parser {
         }
 
 
-        //TODO transitionTreesSet must map the NonTerminals to their transitionTrees
     }
 
     private void addProductionToTree(TransitionTree transitionTree, String production) {

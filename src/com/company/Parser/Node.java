@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class Node {
     private Integer id;
     private static int numOfInstances;
-    //TODO change Integer to Node
     private ArrayList<Pair<Node, String>> neighbours;
     private boolean isEnd = false;
 
