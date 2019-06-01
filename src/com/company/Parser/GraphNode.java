@@ -1,7 +1,5 @@
 package com.company.Parser;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-
 import java.util.ArrayList;
 
 public class GraphNode {
@@ -9,8 +7,21 @@ public class GraphNode {
     private Integer depth = 0;
     private ArrayList<GraphNode> children;
 
-    public GraphNode(Integer depth) {
+    public GraphNode(String label, Integer depth) {
+        this.label = label;
         this.depth = depth;
+    }
+
+//    GraphNode(String label){
+//        this(label)
+//    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public Integer getDepth() {
+        return depth;
     }
 
     public void setChildren(ArrayList<GraphNode> children) {
@@ -18,7 +29,7 @@ public class GraphNode {
     }
 
 
-    public void addChildren(GraphNode graphNode) {
+    public void addChild(GraphNode graphNode) {
         this.children.add(graphNode);
     }
 

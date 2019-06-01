@@ -28,6 +28,7 @@ public class Parser {
     private HashMap<String, ArrayList<String>> rules; // maps the nonTerminals to the expressions they can transform
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
+    private Logger logger;
     private ErrorLogger errorLogger;
     private HashMap<String, String> description = new HashMap<>();
 
@@ -97,7 +98,9 @@ public class Parser {
         //int cursor = 0;
         //String currentNonTerminal = cfgBegin;
         currentToken = lexer.getNextToken();
-        transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken);
+        GraphNode root = new GraphNode(cfgBegin, 0);
+        transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken, root);
+
 
         /*do {
             //transit(tra);
@@ -111,30 +114,47 @@ public class Parser {
         } while (currentToken.getTokenType() != TokenTypes.EOF);*/
     }
 
+    private void dfsAndPrint(GraphNode graphNode){
+        for(int i=0; i<graphNode.getDepth(); i++){
+            System.out.println("|   ");
+        }
+        System.out.println();
+    }
+
     // TODO handle and skip whenever token type is error (and comment)
     // transits the transition diagram of the nonTerminal from the node given to the end of that diagram and
     // returns the next token that hasn't been transited
-    public Token transit(String nonTerminal, Node node, Token token) {
+    // graphNode is the node for parse tree
+    // Node is the node for transition tree
+    public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
         //Node curNode = transitionTree.getCurrentNode();
         if (node.isEnd())
             return token;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
             if (neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)) {
-                return transit(nonTerminal, neighbor.getKey(), token); // eventually does nothing because traverses
+                GraphNode curGraphNode = new GraphNode(epsilon, graphNode.getDepth() + 1);
+                graphNode.addChild(curGraphNode);
+                return transit(nonTerminal, neighbor.getKey(), token, curGraphNode); // eventually does nothing because traverses
                 // an epsilon edge and go to end of tree and return from there
                 // but better to be here for comprehensive algorithm
             }
             if (isInFirst(neighbor.getValue(), token)) {
                 if (isNonTerminal(neighbor.getValue())) {
-                    token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
+                    GraphNode curGraphNode = new GraphNode(neighbor.getValue(), graphNode.getDepth() + 1);
+                    graphNode.addChild(curGraphNode);
+                    token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token, curGraphNode);
                 } else {
+                    GraphNode curGraphNode = new GraphNode(token.getDescription(), graphNode.getDepth() + 1);
+                    graphNode.addChild(curGraphNode);
                     token = lexer.getNextToken();
                 }
-                return transit(nonTerminal, neighbor.getKey(), token);
+                return transit(nonTerminal, neighbor.getKey(), token, graphNode);
             } else if (epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token)) {
-                token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token);
-                return transit(nonTerminal, neighbor.getKey(), token);
+                GraphNode curGraphNode = new GraphNode(neighbor.getValue(), graphNode.getDepth() + 1);
+                graphNode.addChild(curGraphNode);
+                token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token, curGraphNode);
+                return transit(nonTerminal, neighbor.getKey(), token, graphNode);
             }
         }
 
@@ -149,15 +169,15 @@ public class Parser {
         }
         if (!isNonTerminal(neighbor.getValue())) {
             errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
-            return transit(nonTerminal, neighbor.getKey(), token);
+            return transit(nonTerminal, neighbor.getKey(), token, graphNode);
         }
         if (!isInFirst(neighbor.getValue(), token) && !isInFollow(neighbor.getValue(), token)) {
             errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
-            return transit(nonTerminal, node, lexer.getNextToken());
+            return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         assertByMessage(isInFollow(neighbor.getValue(), token) && !epsilonInFirst(neighbor.getValue()));
         errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
-        return transit(nonTerminal, neighbor.getKey(), token);
+        return transit(nonTerminal, neighbor.getKey(), token, graphNode);
     }
 
     private boolean isEOF(String terminalOrNonTerminalName) {
