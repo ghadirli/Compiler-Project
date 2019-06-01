@@ -15,6 +15,7 @@ public class Main {
         Lexer lexer = new Lexer(sampleInputDirectory + "/Input1", sampleOutputDirectory + "/scanner.txt", sampleOutputDirectory + "/lexical_errors.txt");
 //        lexer.analyzer();
         Parser parser = new Parser(sampleInputDirectory + "/Input1", sampleOutputDirectory + "/scanner.txt", sampleOutputDirectory + "/lexical_errors.txt");
+        parser.parse();
 
     }
 
