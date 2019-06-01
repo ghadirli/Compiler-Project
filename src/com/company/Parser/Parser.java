@@ -32,7 +32,6 @@ public class Parser {
     private HashMap<String, String> description = new HashMap<>();
 
 
-
     public Parser(Lexer lexer, String outputFilePath, String errorFilePath) {
         this.lexer = lexer;
         this.errorFilePath = errorFilePath;
@@ -56,7 +55,7 @@ public class Parser {
             reader = new BufferedReader(new FileReader(grammar));
             String line = reader.readLine();
             while (line != null) {
-                System.out.println(line);
+//                System.out.println(line);
                 int arrowIndex = indexOfArrow(line);
                 String left = line.substring(0, arrowIndex);
                 String right = line.substring(arrowIndex + 4);
@@ -87,6 +86,7 @@ public class Parser {
 
     public void parse() {
         initializeTransitionTrees();
+        printTransitionTree(transitionTreesSet.get("PARAMS"));
         Token currentToken;
         //int cursor = 0;
         //String currentNonTerminal = cfgBegin;
@@ -181,33 +181,43 @@ public class Parser {
     // for transition trees
     private void initializeTransitionTrees() {
         for (Map.Entry<String, ArrayList<String>> entry : rules.entrySet()) {
-            System.out.println(entry);
+//            System.out.println(entry);
             TransitionTree transitionTree = new TransitionTree();
             for (int i = 0; i < entry.getValue().size(); i++) {
                 addProductionToTree(transitionTree, entry.getValue().get(i));
             }
-            System.out.println(entry.getKey() + transitionTree);
+//            System.out.print(entry.getKey() + "    and you are very     " );
+//            printTransitionTree(transitionTree);
+
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
 
 
     }
 
+    private void printTransitionTree(TransitionTree transitionTree) {
+        for (int i = 0; i < transitionTree.getRoot().getNeighbours().size(); i++) {
+            System.out.print(transitionTree.getRoot().getNeighbours().get(i).getValue() + " ");
+        }
+//        for(Pair<Node, String> neighbor : transitionTree.getRoot())
+        System.out.println();
+    }
+
     private void addProductionToTree(TransitionTree transitionTree, String production) {
         String[] stringsOfProduction = production.split("\\s+");
         Node terminal = transitionTree.getTerminal();
         Node start = transitionTree.getRoot();
-        if (stringsOfProduction.length == 1)
-            start.addToNeighbours(terminal, stringsOfProduction[0]);
-        else {
-            Node currentNode = start;
-            for (int i = 0; i < stringsOfProduction.length - 1; i++) {
-                Node newNode = new Node();
-                transitionTree.addToNodes(newNode);
-                currentNode.addToNeighbours(newNode, stringsOfProduction[i]);
-                currentNode = newNode;
-            }
+
+        Node currentNode = start;
+        for (int i = 0; i < stringsOfProduction.length - 1; i++) {
+            Node newNode = new Node();
+            transitionTree.addToNodes(newNode);
+            currentNode.addToNeighbours(newNode, stringsOfProduction[i]);
+            currentNode = newNode;
+
+
         }
+        currentNode.addToNeighbours(terminal, stringsOfProduction[stringsOfProduction.length - 1]);
     }
 
     // if terminalOrNonTerminalName is terminal, we return false
