@@ -27,6 +27,7 @@ public class Parser {
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
     private ErrorLogger errorLogger;
+    private HashMap<String, String> description = new HashMap<>();
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
         stack = new Stack<>();
@@ -320,6 +321,49 @@ public class Parser {
         return new ArrayList<String>(Arrays.asList(str.split(", ")));
     }
 
+    public void initializeDescription(){
+        description.put("EXPRESSIONSTMT", "the main program");
+        description.put("CASESTMT", "on case statement");
+        description.put("TYPESPECIFIER", "type of specifier");
+        description.put("FACTOR2", "util for factor ");
+        description.put("SIGNEDFACTOR", " signed factor");
+        description.put("TERM", "");
+        description.put("PARAM", "");
+        description.put("PARAMS2", "");
+        description.put("EXPRESSION3", "");
+        description.put("ARGS", "");
+        description.put("PARAMLIST2", "");
+        description.put("PARAMS", "");
+        description.put("ADDITIVEEXPRESSION2", "");
+        description.put("EXPRESSION2", "");
+        description.put("VAR2", "");
+        description.put("ADDOP", "");
+        description.put("DECLARATION", "");
+        description.put("CASESTMTS", "");
+        description.put("TERM2", "");
+        description.put("PARAMLIST", "");
+        description.put("EXPRESSION", "");
+        description.put("ADDITIVEEXPRESSION", "");
+        description.put("COMPOUNDSTMT", "");
+        description.put("SIMPLEEXPRESSION", "");
+        description.put("ITERATIONSTMT", "");
+        description.put("SIMPLEEXPRESSION2", "");
+        description.put("SWITCHSTMT", "");
+        description.put("RETURNSTMT2", "");
+        description.put("DECLARATION2", "");
+        description.put("PROGRAM", "");
+        description.put("STATEMENTLIST", "");
+        description.put("SELECTIONSTMT", "");
+        description.put("DEFAULTSTMT", "");
+        description.put("FACTOR", "");
+        description.put("STATEMENT", "");
+        description.put("VAR", "");
+        description.put("PARAM2", "");
+        description.put("RELOP", "");
+        description.put("ARGLIST2", "");
+        description.put("RETURNSTMT", "");
+        description.put("ARGLIST", "");
+        description.put("DECLARATIONLIST", "");    }
     public void initializeParseTable() {
 
     }
