@@ -10,7 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-import static com.company.Parser.ErrorLogger.assertByMessage;
+import static com.company.Parser.Logger.assertByMessage;
 
 
 public class Parser {
@@ -29,7 +29,6 @@ public class Parser {
     private String cfgBegin = "PROGRAM"; // (can be final but cleaner if not)
     private final String epsilon = "epsilon";
     private Logger logger;
-    private ErrorLogger errorLogger;
     private HashMap<String, String> description = new HashMap<>();
 
     public Parser(String inputFilePath, String outputFilePath, String errorFilePath) {
@@ -42,13 +41,13 @@ public class Parser {
         initializeFirstSets();
         initializeFollowSets();
         initializeRules();
-        errorLogger = new ErrorLogger(errorFilePath);
+        logger = new Logger(errorFilePath);
     }
 
     public Parser(Lexer lexer, String errorFilePath) {
         this.lexer = lexer;
         this.errorFilePath = errorFilePath;
-        errorLogger = new ErrorLogger(errorFilePath);
+        logger = new Logger(errorFilePath);
         keywordsList = lexer.getKeywordsList();
         symbolsList = lexer.getSymbolsList();
         whiteSpaceList = lexer.getWhiteSpaceList();
@@ -164,19 +163,19 @@ public class Parser {
         // for assertion
         assertByMessage(node.getNeighbours().size() <= 1, "Wrong assumption of neighbor size! it's more than one.");
         if (isEOF(neighbor.getValue())) {
-            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Malformed Input.");
+            logger.log(token.getLineNumber() + ": Syntax Error! Malformed Input.");
             return null; // TODO check
         }
         if (!isNonTerminal(neighbor.getValue())) {
-            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
+            logger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
             return transit(nonTerminal, neighbor.getKey(), token, graphNode);
         }
         if (!isInFirst(neighbor.getValue(), token) && !isInFollow(neighbor.getValue(), token)) {
-            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
+            logger.log(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         assertByMessage(isInFollow(neighbor.getValue(), token) && !epsilonInFirst(neighbor.getValue()));
-        errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
+        logger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
         return transit(nonTerminal, neighbor.getKey(), token, graphNode);
     }
 
