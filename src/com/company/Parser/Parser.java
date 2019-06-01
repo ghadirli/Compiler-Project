@@ -98,7 +98,7 @@ public class Parser {
 
     public void parse() {
         initializeTransitionTrees();
-        printTransitionTrees();
+//        printTransitionTrees();
         Token currentToken;
         //int cursor = 0;
         //String currentNonTerminal = cfgBegin;
@@ -160,6 +160,8 @@ public class Parser {
                 return transit(nonTerminal, neighbor.getKey(), token, graphNode);
             }
         }
+
+        System.out.println(node.getId() +" " +nonTerminal + " " + token.getDescription());
 
         // TODO input must contain error
         // and it should be in a node with out degree = 1
