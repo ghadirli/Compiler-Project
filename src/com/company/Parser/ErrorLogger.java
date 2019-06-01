@@ -16,4 +16,13 @@ public class ErrorLogger {
             e.printStackTrace();
         }
     }
+
+    public static void assertByMessage(boolean exp){
+        assertByMessage(exp, "Assertion Failed!");
+    }
+
+    public static void assertByMessage(boolean exp, String message){
+        if(!exp)
+            throw new RuntimeException(message);
+    }
 }

@@ -10,6 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import static com.company.Parser.ErrorLogger.assertByMessage;
+
 
 public class Parser {
     private Stack<String> stack;
@@ -39,7 +41,6 @@ public class Parser {
         initializeFirstSets();
         initializeFollowSets();
         initializeRules();
-        initializeParseTable();
         errorLogger = new ErrorLogger(errorFilePath);
     }
 
@@ -140,11 +141,27 @@ public class Parser {
         // TODO input must contain error
         // and it should be in a node with out degree = 1
         Pair<Node, String> neighbor = node.getNeighbours().get(0);
+        // for assertion
+        assertByMessage(node.getNeighbours().size() <= 1, "Wrong assumption of neighbor size! it's more than one.");
+        if (isEOF(neighbor.getValue())) {
+            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Malformed Input.");
+            return null; // TODO check
+        }
         if (!isNonTerminal(neighbor.getValue())) {
             errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
-            transit(nonTerminal, neighbor.getKey(), lexer.getNextToken());
-            return;
+            return transit(nonTerminal, neighbor.getKey(), token);
         }
+        if (!isInFirst(neighbor.getValue(), token) && !isInFollow(neighbor.getValue(), token)) {
+            errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
+            return transit(nonTerminal, node, lexer.getNextToken());
+        }
+        assertByMessage(isInFollow(neighbor.getValue(), token) && !epsilonInFirst(neighbor.getValue()));
+        errorLogger.logParseError(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
+        return transit(nonTerminal, neighbor.getKey(), token);
+    }
+
+    private boolean isEOF(String terminalOrNonTerminalName) {
+        //TODO
     }
 
     // for transition trees
@@ -321,7 +338,7 @@ public class Parser {
         return new ArrayList<String>(Arrays.asList(str.split(", ")));
     }
 
-    public void initializeDescription(){
+    public void initializeDescription() {
         description.put("EXPRESSIONSTMT", "the main program");
         description.put("CASESTMT", "on case statement");
         description.put("TYPESPECIFIER", "type of specifier");
@@ -363,8 +380,6 @@ public class Parser {
         description.put("ARGLIST2", "");
         description.put("RETURNSTMT", "");
         description.put("ARGLIST", "");
-        description.put("DECLARATIONLIST", "");    }
-    public void initializeParseTable() {
-
+        description.put("DECLARATIONLIST", "");
     }
 }
