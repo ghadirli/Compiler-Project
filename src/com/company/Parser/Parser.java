@@ -103,6 +103,7 @@ public class Parser {
         //int cursor = 0;
         //String currentNonTerminal = cfgBegin;
         currentToken = lexer.getNextToken();
+        System.out.println(currentToken.getDescription());
         GraphNode root = new GraphNode(cfgBegin, 0);
 //        System.out.println(transitionTreesSet);
 //        System.out.println(transitionTreesSet.get(cfgBegin));
@@ -116,7 +117,8 @@ public class Parser {
         for (int i = 0; i < graphNode.getDepth(); i++) {
             logger.log("|   ");
         }
-        logger.log(graphNode.getLabel());
+
+        logger.log(graphNode.getLabel() + '\n');
         for (GraphNode graphNode1 : graphNode.getChildren()) {
             dfsAndPrint(graphNode1);
         }
@@ -161,7 +163,7 @@ public class Parser {
             }
         }
 
-        System.out.println(node.getId() +" " +nonTerminal + " " + token.getDescription());
+        System.out.println("hello " +node.getId() +" " +nonTerminal + " " + token.getDescription());
 
         // TODO input must contain error
         // and it should be in a node with out degree = 1
@@ -169,20 +171,20 @@ public class Parser {
         // for assertion
         assertByMessage(node.getNeighbours().size() <= 1, "Wrong assumption of neighbor size! it's more than one.");
         //TODO EOF not handled
-        if (isEOF(neighbor.getValue())) {
-            errorLogger.log(token.getLineNumber() + ": Syntax Error! Malformed Input.");
+        /*if (isEOF(neighbor.getValue())) {
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Malformed Input.\n");
             return null; // TODO check
-        }
+        }*/
         if (!isNonTerminal(neighbor.getValue())) {
-            errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue());
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue() + '\n');
             return transit(nonTerminal, neighbor.getKey(), token, graphNode);
         }
         if (!isInFirst(neighbor.getValue(), token) && !isInFollow(neighbor.getValue(), token)) {
-            errorLogger.log(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription());
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Unexpected " + token.getDescription() + '\n');
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         assertByMessage(isInFollow(neighbor.getValue(), token) && !epsilonInFirst(neighbor.getValue()));
-        errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue()); // TODO set Description for neighbor.getValue()
+        errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue() + '\n'); // TODO set Description for neighbor.getValue()
         return transit(nonTerminal, neighbor.getKey(), token, graphNode);
     }
 
@@ -242,14 +244,13 @@ public class Parser {
             return false;
         else {
             return checkIsInSet(token, followSets.get(terminalOrNonTerminalName));
-
         }
     }
 
     // check first, for terminals and nonTerminals
     private boolean isInFirst(String terminalOrNonTerminalName, Token token) {
         if (!isNonTerminal(terminalOrNonTerminalName)) {
-            return terminalOrNonTerminalName.equals(token.getDescription());
+            return terminalOrNonTerminalName.equals(token.getDescription()) || terminalOrNonTerminalName.equals(token.getTokenType().name().toLowerCase());
         } else {
             return checkIsInSet(token, firstSets.get(terminalOrNonTerminalName));
         }
@@ -267,11 +268,19 @@ public class Parser {
                 if (token.getDescription().equals(s))
                     return arr.contains(s);
             }
-        else if (token.getTokenType() == TokenTypes.SYMBOL)
+        else if (token.getTokenType() == TokenTypes.SYMBOL) {
             for (String s : symbolsList) {
                 if (token.getDescription().equals(s))
                     return arr.contains(s);
             }
+            if (token.getDescription().equals("=")){
+                return arr.contains("=");
+            }
+            if (token.getDescription().equals("*")){
+                return arr.contains("*");
+            }
+            // TODO check for other cases
+        }
 
         return false;
     }

@@ -7,6 +7,11 @@ public class Logger {
 
     public Logger(String path) {
         this.path = path;
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, false), "utf-8"))) {
+            writer.write("");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void log(String message) {
