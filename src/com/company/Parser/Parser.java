@@ -280,9 +280,9 @@ public class Parser {
 
     private void initializeFollowSets() {
         followSets.put("PROGRAM", splitWithComma("-|"));
-        followSets.put("DECLARATIONLIST", splitWithComma("eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
-        followSets.put("DECLARATION", splitWithComma("int, void, eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
-        followSets.put("DECLARATION2", splitWithComma("int, void, eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
+        followSets.put("DECLARATIONLIST", splitWithComma("eof, int, void, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
+        followSets.put("DECLARATION", splitWithComma("eof, int, void, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
+        followSets.put("DECLARATION2", splitWithComma("eof, int, void, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }"));
         followSets.put("TYPESPECIFIER", splitWithComma("id"));
         followSets.put("PARAMS", splitWithComma(")"));
         followSets.put("PARAMS2", splitWithComma(")"));
@@ -290,7 +290,7 @@ public class Parser {
         followSets.put("PARAMLIST2", splitWithComma(")"));
         followSets.put("PARAM", splitWithComma(",, )"));
         followSets.put("PARAM2", splitWithComma(",, )"));
-        followSets.put("COMPOUNDSTMT", splitWithComma("int, void, eof, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
+        followSets.put("COMPOUNDSTMT", splitWithComma("eof, int, void, {, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
         followSets.put("STATEMENTLIST", splitWithComma("}, case, default"));
         followSets.put("STATEMENT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
         followSets.put("EXPRESSIONSTMT", splitWithComma("{, continue, break, ;, if, while, return, switch, id, +, -, (, num, }, else, case, default"));
@@ -306,18 +306,18 @@ public class Parser {
         followSets.put("EXPRESSION2", splitWithComma(";, ), ], ,"));
         followSets.put("EXPRESSION3", splitWithComma(";, ), ], ,"));
         followSets.put("VAR", splitWithComma(""));
-        followSets.put("VAR2", splitWithComma("=, *, +, -, <;, ==, ;, ), ], ,"));
+        followSets.put("VAR2", splitWithComma("=, *, +, -, <, ==, ;, ), ], ,"));
         followSets.put("SIMPLEEXPRESSION", splitWithComma(""));
         followSets.put("SIMPLEEXPRESSION2", splitWithComma(";, ), ], ,"));
         followSets.put("RELOP", splitWithComma("+, -, (, id, num"));
-        followSets.put("ADDITIVEEXPRESSION", splitWithComma("<;, ==, ;, ), ], ,"));
-        followSets.put("ADDITIVEEXPRESSION2", splitWithComma("<;, ==, ;, ), ], ,"));
+        followSets.put("ADDITIVEEXPRESSION", splitWithComma("<, ==, ;, ), ], ,"));
+        followSets.put("ADDITIVEEXPRESSION2", splitWithComma("<, ==, ;, ), ], ,"));
         followSets.put("ADDOP", splitWithComma("+, -, (, id, num"));
-        followSets.put("TERM", splitWithComma("+, -, <;, ==, ;, ), ], ,"));
-        followSets.put("TERM2", splitWithComma("+, -, <;, ==, ;, ), ], ,"));
-        followSets.put("SIGNEDFACTOR", splitWithComma("*, +, -, <;, ==, ;, ), ], ,"));
-        followSets.put("FACTOR", splitWithComma("*, +, -, <;, ==, ;, ), ], ,"));
-        followSets.put("FACTOR2", splitWithComma("*, +, -, <;, ==, ;, ), ], ,"));
+        followSets.put("TERM", splitWithComma("+, -, <, ==, ;, ), ], ,"));
+        followSets.put("TERM2", splitWithComma("+, -, <, ==, ;, ), ], ,"));
+        followSets.put("SIGNEDFACTOR", splitWithComma("*, +, -, <, ==, ;, ), ], ,"));
+        followSets.put("FACTOR", splitWithComma("*, +, -, <, ==, ;, ), ], ,"));
+        followSets.put("FACTOR2", splitWithComma("*, +, -, <, ==, ;, ), ], ,"));
         followSets.put("ARGS", splitWithComma(")"));
         followSets.put("ARGLIST", splitWithComma(")"));
         followSets.put("ARGLIST2", splitWithComma(")"));
