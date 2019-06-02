@@ -50,7 +50,7 @@ public class Parser {
     private void initializeRules() {
         BufferedReader reader;
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company";
-        String grammar = sampleInputDirectory + "/newUtil/Grammar_one_per_line";
+        String grammar = sampleInputDirectory + "/newUtil/ReducedGrammar";
         try {
             reader = new BufferedReader(new FileReader(grammar));
             String line = reader.readLine();
