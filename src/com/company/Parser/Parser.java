@@ -280,10 +280,10 @@ public class Parser {
                 if (token.getDescription().equals(s))
                     return arr.contains(s);
             }
-            if (token.getDescription().equals("=")){
+            if (token.getDescription().equals("=")) {
                 return arr.contains("=");
             }
-            if (token.getDescription().equals("*")){
+            if (token.getDescription().equals("*")) {
                 return arr.contains("*");
             }
             // TODO check for other cases
@@ -387,47 +387,45 @@ public class Parser {
     }
 
     public void initializeDescription() {
-        description.put("EXPRESSIONSTMT", "the main program");
+        description.put("EXPRESSIONSTMT", " some expression statement");
         description.put("CASESTMT", "on case statement");
         description.put("TYPESPECIFIER", "type of specifier");
-        description.put("FACTOR2", "util for factor ");
-        description.put("SIGNEDFACTOR", " signed factor");
+        description.put("FACTOR2", " [ or ( or nothing! ");
+        description.put("SIGNEDFACTOR", " + or - or ( or identifier or number");
         description.put("TERM", "term ");
         description.put("PARAM", "parameter");
-        description.put("PARAMS2", "util for parameter");
-        description.put("EXPRESSION3", "");
-        description.put("ARGS", "");
-        description.put("PARAMLIST2", "");
-        description.put("PARAMS", "");
-        description.put("ADDITIVEEXPRESSION2", "");
-        description.put("EXPRESSION2", "");
-        description.put("VAR2", "");
-        description.put("ADDOP", "");
-        description.put("DECLARATION", "");
-        description.put("CASESTMTS", "");
-        description.put("TERM2", "");
-        description.put("PARAMLIST", "");
-        description.put("EXPRESSION", "");
-        description.put("ADDITIVEEXPRESSION", "");
-        description.put("COMPOUNDSTMT", "");
-        description.put("SIMPLEEXPRESSION", "");
-        description.put("ITERATIONSTMT", "");
-        description.put("SIMPLEEXPRESSION2", "");
-        description.put("SWITCHSTMT", "");
-        description.put("RETURNSTMT2", "");
-        description.put("DECLARATION2", "");
-        description.put("PROGRAM", "");
-        description.put("STATEMENTLIST", "");
-        description.put("SELECTIONSTMT", "");
-        description.put("DEFAULTSTMT", "");
-        description.put("FACTOR", "");
-        description.put("STATEMENT", "");
-        description.put("VAR", "");
-        description.put("PARAM2", "");
-        description.put("RELOP", "");
-        description.put("ARGLIST2", "");
-        description.put("RETURNSTMT", "");
-        description.put("ARGLIST", "");
-        description.put("DECLARATIONLIST", "");
+        description.put("PARAMS2", " identifier");
+        description.put("EXPRESSION3", " a keyword - { \"{\", \"(\"} ");
+        description.put("ARGS", "identifier or number or ( or - or + or nothing!");
+        description.put("PARAMLIST2", " , or nothing");
+        description.put("PARAMS", " int or void");
+        description.put("ADDITIVEEXPRESSION2", " + or - or nothing!");
+        description.put("EXPRESSION2", " a symbol");
+        description.put("VAR2", " [ or nothing!");
+        description.put("ADDOP", " + or -");
+        description.put("DECLARATION", "expected int or void");
+        description.put("CASESTMTS", " case or nothing!");
+        description.put("TERM2", " * or nothing!");
+        description.put("EXPRESSION", " identifier or number or ( or - or +");
+        description.put("COMPOUNDSTMT", " { ");
+        description.put("ITERATIONSTMT", " while");
+        description.put("SIMPLEEXPRESSION2", " < or == or nothing!");
+        description.put("SWITCHSTMT", " switch");
+        description.put("RETURNSTMT2", " ; or an expression");
+        description.put("DECLARATION2", " ( or ; or [");
+        description.put("PROGRAM", "program doesn't started");
+        description.put("STATEMENTLIST", " list of statements");
+        description.put("SELECTIONSTMT", " if");
+        description.put("DEFAULTSTMT", " default or nothing!");
+        description.put("FACTOR", " ( or identifier or number");
+        description.put("STATEMENT", " some statements");
+        description.put("PARAM2", " [ or nothing!");
+        description.put("RELOP", " < or ==");
+        description.put("ARGLIST2", ", or epsilon");
+        description.put("RETURNSTMT", " return");
+        description.put("ARGLIST", " identifier or number or or ( or + or -");
+        description.put("DECLARATIONLIST", "you miss body of program");
+        description.put("VARDECLARATION2", " ; or [");
+        description.put("PARAMLIST3", " int or void");
     }
 }
