@@ -30,7 +30,8 @@ public class Parser {
     private Logger logger;
     private Logger errorLogger;
     private HashMap<String, String> description = new HashMap<>();
-
+    private boolean isUnexpectedEnded = false;
+    private boolean isMalformedInput = false;
 
     public Parser(Lexer lexer, String outputFilePath, String errorFilePath) {
         this.lexer = lexer;
@@ -50,7 +51,7 @@ public class Parser {
     private void initializeRules() {
         BufferedReader reader;
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company";
-        String grammar = sampleInputDirectory + "/newUtil/ReducedGrammar";
+        String grammar = sampleInputDirectory + "/newUtil/OriginalGrammar";
         try {
             reader = new BufferedReader(new FileReader(grammar));
             String line = reader.readLine();
@@ -98,16 +99,9 @@ public class Parser {
 
     public void parse() {
         initializeTransitionTrees();
-//        printTransitionTrees();
         Token currentToken;
-        //int cursor = 0;
-        //String currentNonTerminal = cfgBegin;
         currentToken = lexer.getNextToken();
-        // System.out.println(currentToken.getDescription());
         GraphNode root = new GraphNode(cfgBegin, 0);
-//        System.out.println(transitionTreesSet);
-//        System.out.println(transitionTreesSet.get(cfgBegin));
-//        System.out.println(transitionTreesSet.get(cfgBegin).getRoot());
 
         transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken, root);
         dfsAndPrint(root);
@@ -131,7 +125,12 @@ public class Parser {
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
         // System.out.println(token.getDescription());
+        if(isUnexpectedEnded || isMalformedInput)
+            return token;
+
         if (token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR) {
+            if(token.getTokenType() == TokenTypes.ERROR)
+                errorLogger.log(token.getLineNumber() + ": (" + token.getDescription() + ", invalid input)\n");
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         if (node.isEnd())
@@ -169,18 +168,23 @@ public class Parser {
             }
         }
 
-        // System.out.println("hello " +node.getId() +" " +nonTerminal + " " + token.getDescription());
-
-        // TODO input must contain error
+        // input must contain error
         // and it should be in a node with out degree = 1
-        Pair<Node, String> neighbor = node.getNeighbours().get(0);
-        // for assertion
+        if(token.getTokenType().equals(TokenTypes.EOF)){
+            isUnexpectedEnded = true;
+            errorLogger.log(token.getLineNumber() + ": Syntax Error! Unexpected EndOfFile\n");
+            return token;
+        }
+
         assertByMessage(node.getNeighbours().size() <= 1, "Wrong assumption of neighbor size! it's more than one.");
-        //TODO EOF not handled
-        /*if (isEOF(neighbor.getValue())) {
+        Pair<Node, String> neighbor = node.getNeighbours().get(0);
+
+        //the only transit way is by eof but we are in error handling state
+        if (isEOF(neighbor.getValue())) {
+            isMalformedInput = true;
             errorLogger.log(token.getLineNumber() + ": Syntax Error! Malformed Input.\n");
-            return null; // TODO check
-        }*/
+            return token; // check
+        }
         if (!isNonTerminal(neighbor.getValue())) {
             errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue() + '\n');
             return transit(nonTerminal, neighbor.getKey(), token, graphNode);
@@ -190,7 +194,7 @@ public class Parser {
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
         assertByMessage(isInFollow(neighbor.getValue(), token) && !epsilonInFirst(neighbor.getValue()));
-        errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue() + '\n'); // TODO set Description for neighbor.getValue()
+        errorLogger.log(token.getLineNumber() + ": Syntax Error! Missing " + neighbor.getValue() + " :: " + description.get(neighbor.getValue()) + '\n');
         return transit(nonTerminal, neighbor.getKey(), token, graphNode);
     }
 
@@ -203,28 +207,19 @@ public class Parser {
     // for transition trees
     private void initializeTransitionTrees() {
         for (Map.Entry<String, ArrayList<String>> entry : rules.entrySet()) {
-//            System.out.println(entry);
             TransitionTree transitionTree = new TransitionTree();
             for (int i = 0; i < entry.getValue().size(); i++) {
                 addProductionToTree(transitionTree, entry.getValue().get(i));
             }
-//            System.out.print(entry.getKey() + "    and you are very     " );
-//            dfsTransitionTree(transitionTree);
-
             transitionTreesSet.put(entry.getKey(), transitionTree);
         }
-
-
     }
 
     private void dfsTransitionTree(Node currentNode) {
-//        System.out.println(currentNode);
         for (Pair<Node, String> neighbour : currentNode.getNeighbours()) {
             System.out.println(neighbour.getValue());
             dfsTransitionTree(neighbour.getKey());
         }
-
-
     }
 
     private void addProductionToTree(TransitionTree transitionTree, String production) {
@@ -238,15 +233,12 @@ public class Parser {
             transitionTree.addToNodes(newNode);
             currentNode.addToNeighbours(newNode, stringsOfProduction[i]);
             currentNode = newNode;
-
-
         }
         currentNode.addToNeighbours(terminal, stringsOfProduction[stringsOfProduction.length - 1]);
     }
 
     // if terminalOrNonTerminalName is terminal, we return false
     private boolean isInFollow(String terminalOrNonTerminalName, Token token) {
-
         if (!isNonTerminal(terminalOrNonTerminalName))
             return false;
         else {

@@ -96,6 +96,7 @@ public class Lexer {
             e.printStackTrace();
         }
     }
+    //TODO can close writer?
 
     private void writeInFile(String toBePrinted, String path){
         writeInFile(toBePrinted, path, true);
@@ -118,13 +119,15 @@ public class Lexer {
     }
 
     // by the lastCursorPosition
-    // TODO not checked for any potential bug
-    // TODO must pass one time or lineNumber will be wrong
+    // must pass one time or lineNumber will be wrong
     public Token getNextToken(){
         int tokenStartLineNumber =lineNumber;
         Pair<Token, Integer> tokenWithCursor = getNextToken(lastCursorPosition);
         lastCursorPosition = tokenWithCursor.getValue();
-        tokenWithCursor.getKey().setLineNumber(tokenStartLineNumber);
+        int tokenEndLineNumber = lineNumber;
+        tokenWithCursor.getKey().setLineNumber(tokenEndLineNumber);
+        if(tokenWithCursor.getKey().getTokenType() == TokenTypes.EOF)
+            tokenWithCursor.getKey().setLineNumber(tokenEndLineNumber - 1);
         return tokenWithCursor.getKey();
     }
 

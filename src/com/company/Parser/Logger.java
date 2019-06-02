@@ -3,7 +3,8 @@ package com.company.Parser;
 import java.io.*;
 
 public class Logger {
-    String path;
+    private String path;
+//    private boolean unexpectedOutputHasBeenLogged = false;
 
     public Logger(String path) {
         this.path = path;
@@ -21,6 +22,13 @@ public class Logger {
             e.printStackTrace();
         }
     }
+
+//    public void logUnexpectedEndOfFile(int lineNumber){
+//        if(!unexpectedOutputHasBeenLogged){
+//            unexpectedOutputHasBeenLogged = true;
+//            log(lineNumber + ": Syntax Error! Unexpected EndOfFile");
+//        }
+//    }
 
     public static void assertByMessage(boolean exp){
         assertByMessage(exp, "Assertion Failed!");
