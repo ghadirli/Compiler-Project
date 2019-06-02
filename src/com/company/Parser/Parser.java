@@ -103,7 +103,7 @@ public class Parser {
         //int cursor = 0;
         //String currentNonTerminal = cfgBegin;
         currentToken = lexer.getNextToken();
-        System.out.println(currentToken.getDescription());
+        // System.out.println(currentToken.getDescription());
         GraphNode root = new GraphNode(cfgBegin, 0);
 //        System.out.println(transitionTreesSet);
 //        System.out.println(transitionTreesSet.get(cfgBegin));
@@ -130,7 +130,7 @@ public class Parser {
     // graphNode is the node for parse tree
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
-        System.out.println(token.getDescription());
+        // System.out.println(token.getDescription());
         if (token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR) {
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
@@ -169,7 +169,7 @@ public class Parser {
             }
         }
 
-        System.out.println("hello " +node.getId() +" " +nonTerminal + " " + token.getDescription());
+        // System.out.println("hello " +node.getId() +" " +nonTerminal + " " + token.getDescription());
 
         // TODO input must contain error
         // and it should be in a node with out degree = 1
