@@ -245,7 +245,7 @@ public class Lexer {
         transitionMatrix.get(2).set(CharacterTypes.ALPHABET.ordinal(), ERRORSTATE);
         transitionMatrix.get(2).set(CharacterTypes.ENTER.ordinal(), 12);
         transitionMatrix.get(2).set(CharacterTypes.STAR.ordinal(), 12);
-        transitionMatrix.get(2).set(CharacterTypes.SLASH.ordinal(), ERRORSTATE);
+        transitionMatrix.get(2).set(CharacterTypes.SLASH.ordinal(), 4);
         transitionMatrix.get(2).set(CharacterTypes.EQUAL.ordinal(), 12);
         transitionMatrix.get(2).set(CharacterTypes.WHITESPACE.ordinal(), 12);
         transitionMatrix.get(2).set(CharacterTypes.SYMBOL.ordinal(), 12);
