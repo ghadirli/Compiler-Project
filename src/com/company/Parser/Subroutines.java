@@ -40,6 +40,9 @@ public class Subroutines {
             case "#new_breakable":
                 new_breakable();
                 break;
+            case "#end_of_switch":
+                end_of_switch();
+                break;
         }
     }
 
@@ -108,5 +111,13 @@ public class Subroutines {
     private void break0(){
         breakablesLines.get(breakablesLines.size()-1).add(pbLineNumber);
         incrementPBLine();
+    }
+
+    private void end_of_switch(){
+        // for breaks
+        for(int line : breakablesLines.get(breakablesLines.size()-1)){
+            programBlock.set(line, "(JP, " + (pbLineNumber-1) + ", , )");
+        }
+        breakablesLines.remove(breakablesLines.size()-1);
     }
 }
