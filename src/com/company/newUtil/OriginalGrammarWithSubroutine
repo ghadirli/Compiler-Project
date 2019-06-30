@@ -38,7 +38,7 @@ RETURNSTMT2 -> EXPRESSION ;
 SWITCHSTMT -> switch #new_breakable ( EXPRESSION ) { CASESTMTS DEFAULTSTMT } #end_of_switch
 CASESTMTS -> CASESTMT CASESTMTS
 CASESTMTS -> epsilon
-CASESTMT -> case num : #after_case_save STATEMENTLIST #case_save
+CASESTMT -> case #after_case_save num : STATEMENTLIST #case_save
 DEFAULTSTMT -> default : #default STATEMENTLIST
 DEFAULTSTMT -> epsilon #default_epsilon
 EXPRESSION -> id EXPRESSION2
