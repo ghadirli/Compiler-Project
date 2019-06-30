@@ -10,6 +10,7 @@ public class Logger {
         this.path = path;
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, false), "utf-8"))) {
             writer.write("");
+            writer.close(); //TODO check for bug
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -18,6 +19,7 @@ public class Logger {
     public void log(String message) {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), "utf-8"))) {
             writer.write(message);
+            writer.close(); //TODO check for bug
         } catch (IOException e) {
             e.printStackTrace();
         }
