@@ -6,8 +6,12 @@ import com.company.Lexer.TokenTypes;
 import java.util.ArrayList;
 import java.util.Stack;
 
+
+// TODO OriginalGrammarWithSubroutine mustn't have A -> #alpha x0 x1 ... | #alpha y0 y1 ...
+// TODO because we assumed no left recursion in grammar and transitionTrees' middle nodes will not be of degree 1 then
+
 public class Subroutines {
-    private Logger logger;
+    // private Logger logger;
     private ArrayList<Integer> semanticStack = new ArrayList<>();
     private int pbLineNumber;
     private int lastTempMemory = 1000;
@@ -15,8 +19,8 @@ public class Subroutines {
     private ArrayList<ArrayList<Integer>> breakablesLines = new ArrayList<>();
     private boolean isFirstCase = false;
 
-    public Subroutines(Logger logger) {
-        this.logger = logger;
+    public Subroutines() {
+        // this.logger = logger;
         programBlock.add(""); // check
     }
 
