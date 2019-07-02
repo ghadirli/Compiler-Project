@@ -322,7 +322,6 @@ public class Subroutines {
         popss(1);
     }
 
-    // not used yet
     private void pop1() {
         popss(1);
     }
@@ -353,9 +352,9 @@ public class Subroutines {
     private void sum_or_minus() {
         int t = getTempMemory();
         if (ssFromLast(1) == 0) {
-            programBlock.set(pbLineNumber, "ADD, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+            programBlock.set(pbLineNumber, "(ADD, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
         } else {
-            programBlock.set(pbLineNumber, "SUB, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+            programBlock.set(pbLineNumber, "(SUB, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
         }
         popss(3);
         pushss(t);
@@ -372,6 +371,13 @@ public class Subroutines {
         pushss(t);
         incrementPBLine();
 
+    }
+
+    // TODO jump after return
+    private void return_value(){
+        programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + returnValuesAddress + ", )");
+        popss(1);
+        incrementPBLine();
     }
 
     //------------------------getter setter------------------------------
