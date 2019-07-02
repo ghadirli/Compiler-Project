@@ -161,8 +161,6 @@ public class Parser {
             return token;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
-            if(neighbor.getValue().equals("#push_name"))
-                System.out.println("___________________________");
 //            System.out.println("######");
 //            System.out.println(neighbor.getValue());
 //            System.out.println(nonTerminal);

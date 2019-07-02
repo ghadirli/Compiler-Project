@@ -5,7 +5,6 @@ import com.company.Lexer.TokenTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 
 
 // TODO OriginalGrammarWithSubroutine mustn't have A -> #alpha x0 x1 ... | #alpha y0 y1 ...
@@ -93,6 +92,15 @@ public class Subroutines {
             case "#bias_to_memory":
                 bias_to_memory();
                 break;
+            case "#assign":
+                assign();
+                break;
+            case "#pop1":
+                pop1();
+                break;
+            case "push_to_stack_num":
+                push_to_stack_num(nextToken);
+                break;
         }
     }
 
@@ -120,7 +128,7 @@ public class Subroutines {
         return semanticStack.get(semanticStack.size() - 1 - bias);
     }
 
-    int getTempMemory(){
+    int getTempMemory() {
         lastTempMemory += 4;
         return lastTempMemory;
     }
@@ -202,83 +210,83 @@ public class Subroutines {
         }
     }
 
-    private void case_save(){
+    private void case_save() {
         programBlock.set(ssFromLast(0), "JPF, " + ssFromLast(1) + ", " + pbLineNumber + ", )");
         popss(2);
         save();
     }
 
     // TODO check
-    private void default_epsilon(){
+    private void default_epsilon() {
         popss(2);
     }
 
-    private void default0(){
+    private void default0() {
         // TODO
     }
 
-    private void push_name(Token nextToken){
+    private void push_name(Token nextToken) {
         nameStack.add(nextToken.getDescription());
     }
 
     // TODO overloading
-    private void func_addr_in_mem_save(){
-        if(!nameStack.get(nameStack.size()-1).equals("main")){
+    private void func_addr_in_mem_save() {
+        if (!nameStack.get(nameStack.size() - 1).equals("main")) {
             save();
         }
-        if(!currentFunction.equals("")){
+        if (!currentFunction.equals("")) {
             System.out.println("fuck you! this inner function wasn't meant to be here!");
         }
-        currentFunction = nameStack.get(nameStack.size()-1);
-        functionDeclaration.put(nameStack.get(nameStack.size()-1), pbLineNumber);
-        nameStack.remove(nameStack.size()-1);
+        currentFunction = nameStack.get(nameStack.size() - 1);
+        functionDeclaration.put(nameStack.get(nameStack.size() - 1), pbLineNumber);
+        nameStack.remove(nameStack.size() - 1);
     }
 
-    private void func_jump(){
-        if(!currentFunction.equals("main")){
+    private void func_jump() {
+        if (!currentFunction.equals("main")) {
             programBlock.set(ssFromLast(0), "(JP, " + pbLineNumber + ", , )");
             popss(1);
         }
         currentFunction = "";
     }
 
-    private void variable_declare_addr(){
-        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size()-1), lastDataPointer);
+    private void variable_declare_addr() {
+        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size() - 1), lastDataPointer);
         lastDataPointer += 4;
-        nameStack.remove(nameStack.size()-1);
+        nameStack.remove(nameStack.size() - 1);
     }
 
-    private void array_declare_addr(Token nextToken){
-        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size()-1) + "[" + nextToken.getDescription() + "]", lastDataPointer);
+    private void array_declare_addr(Token nextToken) {
+        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size() - 1) + "[" + nextToken.getDescription() + "]", lastDataPointer);
         lastDataPointer += 4 * Integer.parseInt(nextToken.getDescription());
-        nameStack.remove(nameStack.size()-1);
+        nameStack.remove(nameStack.size() - 1);
     }
 
-    private String checkArrayInHashMap(String name, HashMap<String, Integer> hashMap){
-        for(String s : hashMap.keySet()){
-            if(s.startsWith(name) && s.charAt(name.length()) == '['){
+    private String checkArrayInHashMap(String name, HashMap<String, Integer> hashMap) {
+        for (String s : hashMap.keySet()) {
+            if (s.startsWith(name) && s.charAt(name.length()) == '[') {
                 return s;
             }
         }
         return null;
     }
 
-    private void pid(Token nextToken){
+    private void pid(Token nextToken) {
         // TODO check uniqeness #pid a[3] vali int a dashtim (ya barax)
         // TODO halat in ke ye esme tabe va moteghayer yeki bashan handle nemishe
-        if(variableDeclarations.containsKey(currentFunction + "." + nextToken.getDescription())){
+        if (variableDeclarations.containsKey(currentFunction + "." + nextToken.getDescription())) {
             pushss(variableDeclarations.get(currentFunction + "." + nextToken.getDescription()));
         } else {
             String arrayName = checkArrayInHashMap(currentFunction + "." + nextToken.getDescription(), variableDeclarations);
-            if(arrayName != null){
+            if (arrayName != null) {
                 pushss(variableDeclarations.get(arrayName));
-            } else if(variableDeclarations.containsKey("." + nextToken.getDescription())){
+            } else if (variableDeclarations.containsKey("." + nextToken.getDescription())) {
                 pushss(variableDeclarations.get("." + nextToken.getDescription()));
             } else {
                 String globalArrayName = checkArrayInHashMap("." + nextToken.getDescription(), variableDeclarations);
-                if(globalArrayName != null){
+                if (globalArrayName != null) {
                     pushss(variableDeclarations.get(globalArrayName));
-                }else if(functionDeclaration.containsKey(nextToken.getDescription())){
+                } else if (functionDeclaration.containsKey(nextToken.getDescription())) {
                     pushss(functionDeclaration.get(nextToken.getDescription()));
                 } else {
                     System.out.println(nextToken.getDescription() + " is not defined.");
@@ -287,9 +295,28 @@ public class Subroutines {
         }
     }
 
-    private void bias_to_memory(){
-        semanticStack.set(semanticStack.size()-2, semanticStack.get(semanticStack.size()-2) + 4 * semanticStack.get(semanticStack.size()-1));
+    private void bias_to_memory() {
+        semanticStack.set(semanticStack.size() - 2, semanticStack.get(semanticStack.size() - 2) + 4 * semanticStack.get(semanticStack.size() - 1));
         popss(1);
+    }
+
+    private void assign() {
+        System.out.println("salaam");
+        programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + ssFromLast(1) + ", )");
+        incrementPBLine();
+        popss(2);
+    }
+
+    // not used yet
+    private void pop1() {
+        popss(1);
+    }
+
+    private void push_to_stack_num(Token nextToken) {
+        int t = getTempMemory();
+        programBlock.set(pbLineNumber, "(ASSIGN, " + "#" + nextToken.getDescription() + ", " + t + ", )");
+        pushss(t);
+        incrementPBLine();
     }
 
     //------------------------getter setter------------------------------

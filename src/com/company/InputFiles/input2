@@ -1,3 +1,4 @@
 void main(void){
-    int a = 4;
+    int a;
+    a = 4;
 }
