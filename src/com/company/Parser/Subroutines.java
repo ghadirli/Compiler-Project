@@ -15,13 +15,19 @@ public class Subroutines {
     // private Logger logger;
     private ArrayList<Integer> semanticStack = new ArrayList<>();
     private int pbLineNumber;
-    private int lastTempMemory = 1000;
+    private final int startOfTempMemoryAddress = 1000;
+    private int lastTempMemory = startOfTempMemoryAddress;
     private ArrayList<String> programBlock = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> breakablesLines = new ArrayList<>();
-    private HashMap<String, Integer> variableDeclarations = new HashMap<>();
-    private HashMap<String, Integer> functionDeclaration = new HashMap<>();
-    private ArrayList<String> stringStack = new ArrayList<>();
+    private HashMap<String, Integer> variableDeclarations = new HashMap<>(); // variables place in memory
+    private HashMap<String, Integer> functionDeclaration = new HashMap<>(); // functions start line in program block
+    private HashMap<String, String> typeOfVariablesAndFunctions = new HashMap<>(); // int void int[] (or int_10) ...
+    private ArrayList<String> nameStack = new ArrayList<>();
     private boolean isFirstCase = false;
+    private final int returnValuesAddress = startOfTempMemoryAddress - 4;
+    private String currentFunction = null;
+
+    // TODO overloading functions ( f_int_int[10] ) and global local variables (f.a)
 
     public Subroutines() {
         // this.logger = logger;
@@ -64,6 +70,16 @@ public class Subroutines {
             case "#case_save":
                 case_save();
                 break;
+            case "#push_name":
+                push_name(nextToken);
+                break;
+            case "#func_addr_in_mem_save":
+                save_func_addr_in_mem();
+                break;
+            case "#func_jump":
+                func_jump();
+                break;
+
         }
     }
 
@@ -186,5 +202,26 @@ public class Subroutines {
 
     private void default0(){
         // TODO
+    }
+
+    private void push_name(Token nextToken){
+        nameStack.add(nextToken.getDescription());
+    }
+
+    private void save_func_addr_in_mem(){
+        if(!nameStack.get(nameStack.size()-1).equals("main")){
+            save();
+        }
+        currentFunction = nameStack.get(nameStack.size()-1);
+        functionDeclaration.put(nameStack.get(nameStack.size()-1), pbLineNumber);
+        nameStack.remove(nameStack.size()-1);
+    }
+
+    private void func_jump(){
+        if(!currentFunction.equals("main")){
+            programBlock.set(ssFromLast(0), "(JP, " + pbLineNumber + ", , )");
+            popss(1);
+        }
+        currentFunction = null;
     }
 }
