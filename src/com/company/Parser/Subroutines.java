@@ -101,6 +101,18 @@ public class Subroutines {
             case "push_to_stack_num":
                 push_to_stack_num(nextToken);
                 break;
+            case "#mult":
+                mult();
+                break;
+            case "#push0":
+                push0();
+                break;
+            case "#push1":
+                push1();
+                break;
+            case "#sum_or_minus":
+                sum_or_minus();
+                break;
         }
     }
 
@@ -315,6 +327,34 @@ public class Subroutines {
     private void push_to_stack_num(Token nextToken) {
         int t = getTempMemory();
         programBlock.set(pbLineNumber, "(ASSIGN, " + "#" + nextToken.getDescription() + ", " + t + ", )");
+        pushss(t);
+        incrementPBLine();
+    }
+
+    private void mult(){
+        int t = getTempMemory();
+        programBlock.set(pbLineNumber, "(MULT, " + ssFromLast(0) + ", " + ssFromLast(1) + ", " + t + ")");
+        incrementPBLine();
+        popss(2);
+        pushss(t);
+    }
+
+    private void push0(){
+        pushss(0);
+    }
+
+    private void push1(){
+        pushss(1);
+    }
+
+    private void sum_or_minus(){
+        int t = getTempMemory();
+        if(ssFromLast(1) == 0){
+            programBlock.set(pbLineNumber, "ADD, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+        } else {
+            programBlock.set(pbLineNumber, "SUB, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+        }
+        popss(3);
         pushss(t);
         incrementPBLine();
     }
