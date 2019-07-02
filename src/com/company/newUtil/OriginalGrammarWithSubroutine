@@ -27,11 +27,11 @@ STATEMENT -> ITERATIONSTMT
 STATEMENT -> RETURNSTMT
 STATEMENT -> SWITCHSTMT
 EXPRESSIONSTMT -> EXPRESSION ; #pop1
-EXPRESSIONSTMT -> continue ;
+EXPRESSIONSTMT -> continue ; #continue
 EXPRESSIONSTMT -> break ; #break
 EXPRESSIONSTMT -> ;
 SELECTIONSTMT -> if ( EXPRESSION #save ) STATEMENT else #ifsjpf_save STATEMENT #ifsjp
-ITERATIONSTMT -> while #new_breakable ( #label EXPRESSION #save ) STATEMENT #while
+ITERATIONSTMT -> while #new_breakable #new_continuable ( #label EXPRESSION #save ) STATEMENT #while
 RETURNSTMT -> return RETURNSTMT2
 RETURNSTMT2 -> ;
 RETURNSTMT2 -> EXPRESSION ; #return_value

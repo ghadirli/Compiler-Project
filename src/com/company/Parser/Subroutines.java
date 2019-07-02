@@ -20,6 +20,7 @@ public class Subroutines {
     private int lastTempMemory = startOfTempMemoryAddress;
     private ArrayList<String> programBlock = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> breakablesLines = new ArrayList<>();
+    private ArrayList<ArrayList<Integer>> continuableLines = new ArrayList<>();
     private HashMap<String, Integer> variableDeclarations = new HashMap<>(); // variables place in memory
     private HashMap<String, Integer> functionDeclaration = new HashMap<>(); // functions start line in program block
     private HashMap<String, String> typeOfVariablesAndFunctions = new HashMap<>(); // int void int[] (or int_10) ...
@@ -107,6 +108,9 @@ public class Subroutines {
             case "#push0":
                 push0();
                 break;
+            case "#new_continuable":
+                new_continuable();
+                break;
             case "#push1":
                 push1();
                 break;
@@ -122,12 +126,15 @@ public class Subroutines {
             case "#jpf_save_case_and_push_num":
                 jpf_save_case_and_push_num(nextToken);
                 break;
+            case "#continue":
+                continue0();
+                break;
             case "#default":
                 default0();
                 break;
-                default:
-                    System.err.println(subroutineName);
-                    System.err.println("Tu executeSubroutineByName Ridi");
+            default:
+                System.err.println(subroutineName);
+                System.err.println("Tu executeSubroutineByName Ridi");
         }
     }
 
@@ -173,6 +180,11 @@ public class Subroutines {
     }
 
     private void while0() {
+        for (int line : continuableLines.get(continuableLines.size() - 1)) {
+            programBlock.set(line, "(JP, " + ssFromLast(2) + ", , )");
+        }
+        continuableLines.remove(continuableLines.size() - 1);
+
         programBlock.set(ssFromLast(0), "(JPF, " + ssFromLast(1) + ", " + (pbLineNumber + 1) + ", )");
         programBlock.set(pbLineNumber, "(JP, " + ssFromLast(2) + ", , )");
         incrementPBLine();
@@ -183,6 +195,8 @@ public class Subroutines {
             programBlock.set(line, "(JP, " + (pbLineNumber - 1) + ", , )");
         }
         breakablesLines.remove(breakablesLines.size() - 1);
+
+
     }
 
     private void ifsjps_save() {
@@ -201,8 +215,17 @@ public class Subroutines {
         breakablesLines.add(new ArrayList<>());
     }
 
+    private void new_continuable() {
+        continuableLines.add(new ArrayList<>());
+    }
+
     private void break0() {
         breakablesLines.get(breakablesLines.size() - 1).add(pbLineNumber);
+        incrementPBLine();
+    }
+
+    private void continue0() {
+        continuableLines.get(continuableLines.size() - 1).add(pbLineNumber);
         incrementPBLine();
     }
 
@@ -393,28 +416,28 @@ public class Subroutines {
     }
 
     // TODO jump after return
-    private void return_value(){
+    private void return_value() {
         programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + returnValuesAddress + ", )");
         popss(1);
         incrementPBLine();
     }
 
     // TODO first and last one
-    private void jpf_save_case_and_push_num(Token nextToken){
+    private void jpf_save_case_and_push_num(Token nextToken) {
         int t1 = getTempMemory();
 
-        if(!isFirstCase) {
+        if (!isFirstCase) {
             int t = getTempMemory();
             programBlock.set(pbLineNumber, "(JP, " + (pbLineNumber + 4) + ", , )");
             incrementPBLine();
             programBlock.set(pbLineNumber, "(ASSIGN, " + "#" + nextToken.getDescription() + ", " + t1 + ", )");
             incrementPBLine();
             programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
-            programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + (pbLineNumber-1) + ", )");
+            programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + (pbLineNumber - 1) + ", )");
             popss(2);
             save();
             incrementPBLine();
-        } else{
+        } else {
             programBlock.set(pbLineNumber, "(ASSIGN, " + "#" + nextToken.getDescription() + ", " + t1 + ", )");
             incrementPBLine();
             save();
