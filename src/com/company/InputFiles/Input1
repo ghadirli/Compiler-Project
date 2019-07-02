@@ -1,8 +1,15 @@
 void main(void){
     int a;
-    if(a == a){
-        a = a;
-    } else {
-        a = a + a;
+    int b;
+    a = 4;
+    b = 6;
+    while ( a < 6){
+        a = a + 1;
+        if (a == 5)
+            continue;
+        else
+            a = 7;
+        b = b+5;
+
     }
 }
