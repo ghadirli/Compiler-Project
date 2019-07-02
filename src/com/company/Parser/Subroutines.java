@@ -24,7 +24,7 @@ public class Subroutines {
     private HashMap<String, Integer> functionDeclaration = new HashMap<>(); // functions start line in program block
     private HashMap<String, String> typeOfVariablesAndFunctions = new HashMap<>(); // int void int[] (or int_10) ...
     private ArrayList<String> nameStack = new ArrayList<>();
-    private boolean isFirstCase = false;
+    private boolean isFirstCase = true;
     private final int returnValuesAddress = startOfTempMemoryAddress - 4;
     private String currentFunction = "";
 
@@ -116,7 +116,14 @@ public class Subroutines {
             case "#lt_or_equal":
                 lt_or_equal();
                 break;
+            case "#default_epsilon":
+                default_epsilon();
+                break;
+            case "#return_value":
+                return_value();
+                break;
                 default:
+                    System.err.println(subroutineName);
                     System.err.println("Tu executeSubroutineByName Ridi");
         }
     }
@@ -176,9 +183,9 @@ public class Subroutines {
     }
 
     private void ifsjps_save() {
-        programBlock.set(ssFromLast(0), "JPF, " + ssFromLast(1) + ", " + (pbLineNumber + 1) + ", )");
+        programBlock.set(ssFromLast(0), "(JPF, " + ssFromLast(1) + ", " + (pbLineNumber + 1) + ", )");
         popss(2);
-        pushss(pbLineNumber + 1);
+        pushss(pbLineNumber);
         incrementPBLine();
     }
 
@@ -202,6 +209,8 @@ public class Subroutines {
             programBlock.set(line, "(JP, " + (pbLineNumber - 1) + ", , )");
         }
         breakablesLines.remove(breakablesLines.size() - 1);
+        isFirstCase = true;
+        popss(1); // check
     }
 
     // TODO must handle isFirstCase
@@ -215,10 +224,11 @@ public class Subroutines {
                 pushss(tempMem);
                 incrementPBLine();
                 save();
+                isFirstCase = false;
             } else {
                 programBlock.set(pbLineNumber, "(EQ, " + ssFromLast(1) + ", #" + nextToken.getDescription() + ", " + tempMem + ")");
                 incrementPBLine();
-                programBlock.set(ssFromLast(0), "JP, " + pbLineNumber + ", , )");
+                programBlock.set(ssFromLast(0), "(JP, " + pbLineNumber + ", , )");
                 //incrementPBLine();
                 popss(1);
                 pushss(tempMem);
@@ -228,7 +238,7 @@ public class Subroutines {
     }
 
     private void case_save() {
-        programBlock.set(ssFromLast(0), "JPF, " + ssFromLast(1) + ", " + pbLineNumber + ", )");
+        programBlock.set(ssFromLast(0), "(JPF, " + ssFromLast(1) + ", " + pbLineNumber + ", )");
         popss(2);
         save();
     }
@@ -240,6 +250,10 @@ public class Subroutines {
 
     private void default0() {
         // TODO
+        int t = getTempMemory();
+        programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t);
+        programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + pbLineNumber + ", )");
+        popss(2);
     }
 
     private void push_name(Token nextToken) {
@@ -318,7 +332,7 @@ public class Subroutines {
     }
 
     private void assign() {
-        System.out.println("salaam");
+//        System.out.println("salaam");
         programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + ssFromLast(1) + ", )");
         incrementPBLine();
         popss(1);
@@ -380,6 +394,24 @@ public class Subroutines {
         programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + returnValuesAddress + ", )");
         popss(1);
         incrementPBLine();
+    }
+
+    // TODO first and last one
+    private void jpf_save_case(){
+        if(!isFirstCase) {
+            int t = getTempMemory();
+            programBlock.set(pbLineNumber, "(JP, " + (pbLineNumber + 3) + ", , )");
+            incrementPBLine();
+            programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t);
+            programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + pbLineNumber + ", )");
+            popss(2);
+            save();
+            incrementPBLine();
+        } else{
+            save();
+            incrementPBLine();
+            isFirstCase = false;
+        }
     }
 
     //------------------------getter setter------------------------------

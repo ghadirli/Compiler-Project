@@ -1,3 +1,14 @@
 void main(void){
-    int a = 2*4 + 9;
+    int a;
+    a = 2;
+    while(a < 23){
+        a = 2*4 + 9;
+    }
+
+    if(44 < a){
+        a = a * a + a * a;
+    } else {
+           a = a;
+    }
+
 }

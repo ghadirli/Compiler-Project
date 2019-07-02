@@ -38,9 +38,9 @@ RETURNSTMT2 -> EXPRESSION ; #return_value
 SWITCHSTMT -> switch #new_breakable ( EXPRESSION ) { CASESTMTS DEFAULTSTMT } #end_of_switch
 CASESTMTS -> CASESTMT CASESTMTS
 CASESTMTS -> epsilon
-CASESTMT -> case #after_case_save num : STATEMENTLIST #case_save
+CASESTMT -> case #jpf_save_case #push_to_stack_num num : STATEMENTLIST
 DEFAULTSTMT -> default : #default STATEMENTLIST
-DEFAULTSTMT -> epsilon #default_epsilon
+DEFAULTSTMT -> epsilon #default
 EXPRESSION -> #pid id EXPRESSION2
 EXPRESSION -> #push_to_stack_num num TERM2 ADDITIVEEXPRESSION2 SIMPLEEXPRESSION2
 EXPRESSION -> ( EXPRESSION ) TERM2 ADDITIVEEXPRESSION2 SIMPLEEXPRESSION2

@@ -125,8 +125,10 @@ public class Parser {
         dfsAndPrint(root);
         ArrayList<String> intermediateCode = subroutines.getProgramBlock();
         System.out.println(intermediateCode.size());
+        int ln = 0;
         for(String line : intermediateCode){
-            System.out.println(line);
+            System.out.println(ln + "\t" + line);
+            ln++;
         }
     }
 
@@ -172,7 +174,7 @@ public class Parser {
             // TODO check for potential bug
             while(curEdgeString.startsWith("#")){
                 // last node
-                System.err.println(curEdgeString);
+                // System.err.println(curEdgeString);
                 if(curNode.isEnd()){
                     handleActionSymbols(neighbor, token);
                     return token;
