@@ -116,11 +116,14 @@ public class Subroutines {
             case "#lt_or_equal":
                 lt_or_equal();
                 break;
-            case "#default_epsilon":
-                default_epsilon();
-                break;
             case "#return_value":
                 return_value();
+                break;
+            case "#jpf_save_case_and_push_num":
+                jpf_save_case_and_push_num(nextToken);
+                break;
+            case "#default":
+                default0();
                 break;
                 default:
                     System.err.println(subroutineName);
@@ -206,7 +209,7 @@ public class Subroutines {
     private void end_of_switch() {
         // for breaks
         for (int line : breakablesLines.get(breakablesLines.size() - 1)) {
-            programBlock.set(line, "(JP, " + (pbLineNumber - 1) + ", , )");
+            programBlock.set(line, "(JP, " + pbLineNumber + ", , )");
         }
         breakablesLines.remove(breakablesLines.size() - 1);
         isFirstCase = true;
@@ -251,7 +254,7 @@ public class Subroutines {
     private void default0() {
         // TODO
         int t = getTempMemory();
-        programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t);
+        programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
         programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + pbLineNumber + ", )");
         popss(2);
     }
@@ -397,21 +400,29 @@ public class Subroutines {
     }
 
     // TODO first and last one
-    private void jpf_save_case(){
+    private void jpf_save_case_and_push_num(Token nextToken){
+        int t1 = getTempMemory();
+
         if(!isFirstCase) {
             int t = getTempMemory();
-            programBlock.set(pbLineNumber, "(JP, " + (pbLineNumber + 3) + ", , )");
+            programBlock.set(pbLineNumber, "(JP, " + (pbLineNumber + 4) + ", , )");
             incrementPBLine();
-            programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t);
-            programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + pbLineNumber + ", )");
+            programBlock.set(pbLineNumber, "(ASSIGN, " + "#" + nextToken.getDescription() + ", " + t1 + ", )");
+            incrementPBLine();
+            programBlock.set(ssFromLast(1), "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+            programBlock.set(ssFromLast(1) + 1, "(JPF, " + t + ", " + (pbLineNumber-1) + ", )");
             popss(2);
             save();
             incrementPBLine();
         } else{
+            programBlock.set(pbLineNumber, "(ASSIGN, " + "#" + nextToken.getDescription() + ", " + t1 + ", )");
+            incrementPBLine();
             save();
             incrementPBLine();
             isFirstCase = false;
         }
+
+        pushss(t1);
     }
 
     //------------------------getter setter------------------------------

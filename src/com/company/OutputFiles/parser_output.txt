@@ -93,7 +93,7 @@ PROGRAM
 |   |   |   |   |   |   |   |   |   |   CASESTMTS
 |   |   |   |   |   |   |   |   |   |   |   CASESTMT
 |   |   |   |   |   |   |   |   |   |   |   |   case
-|   |   |   |   |   |   |   |   |   |   |   |   4
+|   |   |   |   |   |   |   |   |   |   |   |   7
 |   |   |   |   |   |   |   |   |   |   |   |   :
 |   |   |   |   |   |   |   |   |   |   |   |   STATEMENTLIST
 |   |   |   |   |   |   |   |   |   |   |   |   |   STATEMENT
@@ -115,11 +115,16 @@ PROGRAM
 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   ;
 |   |   |   |   |   |   |   |   |   |   |   |   |   STATEMENTLIST
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   STATEMENT
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   EXPRESSIONSTMT
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   break
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   ;
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   STATEMENTLIST
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
 |   |   |   |   |   |   |   |   |   |   |   CASESTMTS
 |   |   |   |   |   |   |   |   |   |   |   |   CASESTMT
 |   |   |   |   |   |   |   |   |   |   |   |   |   case
-|   |   |   |   |   |   |   |   |   |   |   |   |   7
+|   |   |   |   |   |   |   |   |   |   |   |   |   4
 |   |   |   |   |   |   |   |   |   |   |   |   |   :
 |   |   |   |   |   |   |   |   |   |   |   |   |   STATEMENTLIST
 |   |   |   |   |   |   |   |   |   |   |   |   |   |   STATEMENT
@@ -145,7 +150,29 @@ PROGRAM
 |   |   |   |   |   |   |   |   |   |   |   |   CASESTMTS
 |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
 |   |   |   |   |   |   |   |   |   DEFAULTSTMT
-|   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   default
+|   |   |   |   |   |   |   |   |   |   :
+|   |   |   |   |   |   |   |   |   |   STATEMENTLIST
+|   |   |   |   |   |   |   |   |   |   |   STATEMENT
+|   |   |   |   |   |   |   |   |   |   |   |   EXPRESSIONSTMT
+|   |   |   |   |   |   |   |   |   |   |   |   |   EXPRESSION
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   a
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   EXPRESSION2
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   VAR2
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   EXPRESSION3
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   =
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   EXPRESSION
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   3
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   TERM2
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   ADDITIVEEXPRESSION2
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   SIMPLEEXPRESSION2
+|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   |   ;
+|   |   |   |   |   |   |   |   |   |   |   STATEMENTLIST
+|   |   |   |   |   |   |   |   |   |   |   |   epsilon
 |   |   |   |   |   |   |   |   |   }
 |   |   |   |   |   |   |   STATEMENTLIST
 |   |   |   |   |   |   |   |   epsilon

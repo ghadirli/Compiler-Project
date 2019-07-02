@@ -38,7 +38,7 @@ RETURNSTMT2 -> EXPRESSION ; #return_value
 SWITCHSTMT -> switch #new_breakable ( EXPRESSION ) { CASESTMTS DEFAULTSTMT } #end_of_switch
 CASESTMTS -> CASESTMT CASESTMTS
 CASESTMTS -> epsilon
-CASESTMT -> case #jpf_save_case #push_to_stack_num num : STATEMENTLIST
+CASESTMT -> case #jpf_save_case_and_push_num num : STATEMENTLIST
 DEFAULTSTMT -> default : #default STATEMENTLIST
 DEFAULTSTMT -> epsilon #default
 EXPRESSION -> #pid id EXPRESSION2
