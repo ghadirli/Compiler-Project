@@ -1,7 +1,0 @@
-7: Syntax Error! Missing SIGNEDFACTOR :: null
-13: Syntax Error! Unexpected =
-13: Syntax Error! Missing DECLARATION2 :: null
-14: Syntax Error! Missing (
-16: Syntax Error! Unexpected [
-16: Syntax Error! Missing SIGNEDFACTOR :: null
-19: Syntax Error! Missing RETURNSTMT2 :: null

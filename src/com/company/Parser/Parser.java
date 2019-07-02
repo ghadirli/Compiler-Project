@@ -53,7 +53,7 @@ public class Parser {
     private void initializeRules() {
         BufferedReader reader;
         String sampleInputDirectory = System.getProperty("user.dir") + "/src/com/company";
-        String grammar = sampleInputDirectory + "/newUtil/OriginalGrammar";
+        String grammar = sampleInputDirectory + "/newUtil/OriginalGrammarWithSubroutine";
         try {
             reader = new BufferedReader(new FileReader(grammar));
             String line = reader.readLine();
@@ -123,6 +123,11 @@ public class Parser {
 
         transit(cfgBegin, transitionTreesSet.get(cfgBegin).getRoot(), currentToken, root);
         dfsAndPrint(root);
+        ArrayList<String> intermediateCode = subroutines.getProgramBlock();
+        System.out.println(intermediateCode.size());
+        for(String line : intermediateCode){
+            System.out.println(line);
+        }
     }
 
     private void dfsAndPrint(GraphNode graphNode) {
@@ -142,6 +147,7 @@ public class Parser {
     // graphNode is the node for parse tree
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
+
         // System.out.println(token.getDescription());
         if (isUnexpectedEnded || isMalformedInput)
             return token;
@@ -155,6 +161,8 @@ public class Parser {
             return token;
 
         for (Pair<Node, String> neighbor : node.getNeighbours()) {
+            if(neighbor.getValue().equals("#push_name"))
+                System.out.println("___________________________");
 //            System.out.println("######");
 //            System.out.println(neighbor.getValue());
 //            System.out.println(nonTerminal);
@@ -166,12 +174,13 @@ public class Parser {
             // TODO check for potential bug
             while(curEdgeString.startsWith("#")){
                 // last node
+                System.err.println(curEdgeString);
                 if(curNode.isEnd()){
                     handleActionSymbols(neighbor, token);
                     return token;
                 }
-                curNode = curNode.getNeighbours().get(0).getKey();
                 curEdgeString = curNode.getNeighbours().get(0).getValue();
+                curNode = curNode.getNeighbours().get(0).getKey();
             }
 
             //----------------------------------------------------------------------

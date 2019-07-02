@@ -16,6 +16,8 @@ public class Subroutines {
     private ArrayList<Integer> semanticStack = new ArrayList<>();
     private int pbLineNumber;
     private final int startOfTempMemoryAddress = 1000;
+    private final int dataSectionStart = 500;
+    private int lastDataPointer = dataSectionStart;
     private int lastTempMemory = startOfTempMemoryAddress;
     private ArrayList<String> programBlock = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> breakablesLines = new ArrayList<>();
@@ -25,7 +27,7 @@ public class Subroutines {
     private ArrayList<String> nameStack = new ArrayList<>();
     private boolean isFirstCase = false;
     private final int returnValuesAddress = startOfTempMemoryAddress - 4;
-    private String currentFunction = null;
+    private String currentFunction = "";
 
     // TODO overloading functions ( f_int_int[10] ) and global local variables (f.a)
 
@@ -74,12 +76,17 @@ public class Subroutines {
                 push_name(nextToken);
                 break;
             case "#func_addr_in_mem_save":
-                save_func_addr_in_mem();
+                func_addr_in_mem_save();
                 break;
             case "#func_jump":
                 func_jump();
                 break;
-
+            case "#variable_declare_addr":
+                variable_declare_addr();
+                break;
+            case "#array_declare_addr":
+                array_declare_addr(nextToken);
+                break;
         }
     }
 
@@ -208,9 +215,12 @@ public class Subroutines {
         nameStack.add(nextToken.getDescription());
     }
 
-    private void save_func_addr_in_mem(){
+    private void func_addr_in_mem_save(){
         if(!nameStack.get(nameStack.size()-1).equals("main")){
             save();
+        }
+        if(!currentFunction.equals("")){
+            System.out.println("fuck you! this inner function wasn't meant to be here!");
         }
         currentFunction = nameStack.get(nameStack.size()-1);
         functionDeclaration.put(nameStack.get(nameStack.size()-1), pbLineNumber);
@@ -222,6 +232,33 @@ public class Subroutines {
             programBlock.set(ssFromLast(0), "(JP, " + pbLineNumber + ", , )");
             popss(1);
         }
-        currentFunction = null;
+        currentFunction = "";
+    }
+
+    private void variable_declare_addr(){
+        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size()-1), lastDataPointer);
+        lastDataPointer += 4;
+        nameStack.remove(nameStack.size()-1);
+    }
+
+    private void array_declare_addr(Token nextToken){
+        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size()-1) + "[" + nextToken.getDescription() + "]", lastDataPointer);
+        lastDataPointer += 4 * Integer.parseInt(nextToken.getDescription());
+        nameStack.remove(nameStack.size()-1);
+    }
+
+    private void pid(Token nextToken){
+        // TODO
+        if(variableDeclarations.containsKey(nextToken.getDescription())){
+            pushss(variableDeclarations.get(nextToken.getDescription()));
+        } else if(functionDeclaration.containsKey(nextToken.getDescription())){
+            pushss(functionDeclaration.get(nextToken.getDescription()));
+        }
+    }
+
+    //------------------------getter setter------------------------------
+
+    public ArrayList<String> getProgramBlock() {
+        return programBlock;
     }
 }
