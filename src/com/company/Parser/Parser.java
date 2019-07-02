@@ -32,6 +32,8 @@ public class Parser {
     private HashMap<String, String> description = new HashMap<>();
     private boolean isUnexpectedEnded = false;
     private boolean isMalformedInput = false;
+    private Subroutines subroutines = new Subroutines();
+
 
     public Parser(Lexer lexer, String outputFilePath, String errorFilePath) {
         this.lexer = lexer;
@@ -75,6 +77,22 @@ public class Parser {
         }
 
     }
+
+    // TODO added for subroutines check for potential bugs
+    private void handleActionSymbols(Pair<Node, String> neighbor, Token nextToken) {
+        while (neighbor.getValue().startsWith("#")) {
+            subroutines.executeSubroutineByName(neighbor.getValue(), nextToken);
+            if (neighbor.getKey().getNeighbours().size() == 1)
+                neighbor = neighbor.getKey().getNeighbours().get(0);
+            else if (neighbor.getKey().getNeighbours().size() == 0) {
+                break;
+            } else {
+                System.err.println("error occurred in Parser::handleActionSymbol: number of neighbors > 1 (degree of inner node in transition tree > 1)");
+                return;
+            }
+        }
+    }
+
 
     // check can change to string.find() ?
     public int indexOfArrow(String string) {
@@ -125,11 +143,11 @@ public class Parser {
     // Node is the node for transition tree
     public Token transit(String nonTerminal, Node node, Token token, GraphNode graphNode) {
         // System.out.println(token.getDescription());
-        if(isUnexpectedEnded || isMalformedInput)
+        if (isUnexpectedEnded || isMalformedInput)
             return token;
 
         if (token.getTokenType() == TokenTypes.COMMENT || token.getTokenType() == TokenTypes.ERROR) {
-            if(token.getTokenType() == TokenTypes.ERROR)
+            if (token.getTokenType() == TokenTypes.ERROR)
                 errorLogger.log(token.getLineNumber() + ": (" + token.getDescription() + ", invalid input)\n");
             return transit(nonTerminal, node, lexer.getNextToken(), graphNode);
         }
@@ -142,35 +160,57 @@ public class Parser {
 //            System.out.println(nonTerminal);
 //            System.out.println(token.getTokenType() + " " + token.getDescription());
 //            System.out.println(isInFollow(nonTerminal, token));
-            if (neighbor.getValue().equals(epsilon) && isInFollow(nonTerminal, token)) {
+            Node curNode = neighbor.getKey();
+            String curEdgeString = neighbor.getValue();
+            //----------------for subroutines accomplishment-----------------------------
+            // TODO check for potential bug
+            while(curEdgeString.startsWith("#")){
+                // last node
+                if(curNode.isEnd()){
+                    handleActionSymbols(neighbor, token);
+                    return token;
+                }
+                curNode = curNode.getNeighbours().get(0).getKey();
+                curEdgeString = curNode.getNeighbours().get(0).getValue();
+            }
+
+            //----------------------------------------------------------------------
+
+
+            if (curEdgeString.equals(epsilon) && isInFollow(nonTerminal, token)) {
+                handleActionSymbols(neighbor, token);
                 GraphNode curGraphNode = new GraphNode(epsilon, graphNode.getDepth() + 1);
                 graphNode.addChild(curGraphNode);
-                return transit(nonTerminal, neighbor.getKey(), token, curGraphNode); // eventually does nothing because traverses
+                return transit(nonTerminal, curNode, token, curGraphNode); // eventually does nothing because traverses
                 // an epsilon edge and go to end of tree and return from there
                 // but better to be here for comprehensive algorithm
             }
-            if (isInFirst(neighbor.getValue(), token)) {
-                if (isNonTerminal(neighbor.getValue())) {
-                    GraphNode curGraphNode = new GraphNode(neighbor.getValue(), graphNode.getDepth() + 1);
+            if (isInFirst(curEdgeString, token)) {
+                handleActionSymbols(neighbor, token);
+                if (isNonTerminal(curEdgeString)) {
+                    GraphNode curGraphNode = new GraphNode(curEdgeString, graphNode.getDepth() + 1);
                     graphNode.addChild(curGraphNode);
-                    token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token, curGraphNode);
+                    token = transit(curEdgeString, transitionTreesSet.get(curEdgeString).getRoot(), token, curGraphNode);
                 } else {
                     GraphNode curGraphNode = new GraphNode(token.getDescription(), graphNode.getDepth() + 1);
                     graphNode.addChild(curGraphNode);
                     token = lexer.getNextToken();
                 }
-                return transit(nonTerminal, neighbor.getKey(), token, graphNode);
-            } else if (epsilonInFirst(neighbor.getValue()) && isInFollow(neighbor.getValue(), token)) {
-                GraphNode curGraphNode = new GraphNode(neighbor.getValue(), graphNode.getDepth() + 1);
+                return transit(nonTerminal, curNode, token, graphNode);
+            } else if (epsilonInFirst(curEdgeString) && isInFollow(curEdgeString, token)) {
+                handleActionSymbols(neighbor, token);
+                GraphNode curGraphNode = new GraphNode(curEdgeString, graphNode.getDepth() + 1);
                 graphNode.addChild(curGraphNode);
-                token = transit(neighbor.getValue(), transitionTreesSet.get(neighbor.getValue()).getRoot(), token, curGraphNode);
-                return transit(nonTerminal, neighbor.getKey(), token, graphNode);
+                token = transit(curEdgeString, transitionTreesSet.get(curEdgeString).getRoot(), token, curGraphNode);
+                return transit(nonTerminal, curNode, token, graphNode);
             }
         }
 
         // input must contain error
         // and it should be in a node with out degree = 1
-        if(token.getTokenType().equals(TokenTypes.EOF)){
+        handleActionSymbols(node.getNeighbours().get(0), token); // so the error logs for parser be created correctly
+
+        if (token.getTokenType().equals(TokenTypes.EOF)) {
             isUnexpectedEnded = true;
             errorLogger.log(token.getLineNumber() + ": Syntax Error! Unexpected EndOfFile\n");
             return token;
