@@ -87,6 +87,12 @@ public class Subroutines {
             case "#array_declare_addr":
                 array_declare_addr(nextToken);
                 break;
+            case "#pid":
+                pid(nextToken);
+                break;
+            case "#bias_to_memory":
+                bias_to_memory();
+                break;
         }
     }
 
@@ -215,6 +221,7 @@ public class Subroutines {
         nameStack.add(nextToken.getDescription());
     }
 
+    // TODO overloading
     private void func_addr_in_mem_save(){
         if(!nameStack.get(nameStack.size()-1).equals("main")){
             save();
@@ -247,13 +254,42 @@ public class Subroutines {
         nameStack.remove(nameStack.size()-1);
     }
 
-    private void pid(Token nextToken){
-        // TODO
-        if(variableDeclarations.containsKey(nextToken.getDescription())){
-            pushss(variableDeclarations.get(nextToken.getDescription()));
-        } else if(functionDeclaration.containsKey(nextToken.getDescription())){
-            pushss(functionDeclaration.get(nextToken.getDescription()));
+    private String checkArrayInHashMap(String name, HashMap<String, Integer> hashMap){
+        for(String s : hashMap.keySet()){
+            if(s.startsWith(name) && s.charAt(name.length()) == '['){
+                return s;
+            }
         }
+        return null;
+    }
+
+    private void pid(Token nextToken){
+        // TODO check uniqeness #pid a[3] vali int a dashtim (ya barax)
+        // TODO halat in ke ye esme tabe va moteghayer yeki bashan handle nemishe
+        if(variableDeclarations.containsKey(currentFunction + "." + nextToken.getDescription())){
+            pushss(variableDeclarations.get(currentFunction + "." + nextToken.getDescription()));
+        } else {
+            String arrayName = checkArrayInHashMap(currentFunction + "." + nextToken.getDescription(), variableDeclarations);
+            if(arrayName != null){
+                pushss(variableDeclarations.get(arrayName));
+            } else if(variableDeclarations.containsKey("." + nextToken.getDescription())){
+                pushss(variableDeclarations.get("." + nextToken.getDescription()));
+            } else {
+                String globalArrayName = checkArrayInHashMap("." + nextToken.getDescription(), variableDeclarations);
+                if(globalArrayName != null){
+                    pushss(variableDeclarations.get(globalArrayName));
+                }else if(functionDeclaration.containsKey(nextToken.getDescription())){
+                    pushss(functionDeclaration.get(nextToken.getDescription()));
+                } else {
+                    System.out.println(nextToken.getDescription() + " is not defined.");
+                }
+            }
+        }
+    }
+
+    private void bias_to_memory(){
+        semanticStack.set(semanticStack.size()-2, semanticStack.get(semanticStack.size()-2) + 4 * semanticStack.get(semanticStack.size()-1));
+        popss(1);
     }
 
     //------------------------getter setter------------------------------
