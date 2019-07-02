@@ -1,7 +1,7 @@
 package com.company.Parser;
 
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.HashMap;
 
 public class Subroutines {
     private Logger logger;
@@ -9,6 +9,9 @@ public class Subroutines {
     private int pbLineNumber;
     private ArrayList<String> programBlock = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> breakablesLines = new ArrayList<>();
+    private HashMap<String, Integer> variableDeclarations = new HashMap<>();
+    private HashMap<String, Integer> functionDeclaration = new HashMap<>();
+    private ArrayList<String> stringStack = new ArrayList<>();
     public Subroutines(Logger logger){
         this.logger = logger;
     }
@@ -43,7 +46,13 @@ public class Subroutines {
             case "#end_of_switch":
                 end_of_switch();
                 break;
+            case "#save_in_memory":
+                save_in_memory();
         }
+    }
+
+    private void save_in_memory() {
+
     }
 
     private void popss(int numberToPop){
