@@ -98,7 +98,7 @@ public class Subroutines {
             case "#pop1":
                 pop1();
                 break;
-            case "push_to_stack_num":
+            case "#push_to_stack_num":
                 push_to_stack_num(nextToken);
                 break;
             case "#mult":
@@ -116,6 +116,8 @@ public class Subroutines {
             case "#lt_or_equal":
                 lt_or_equal();
                 break;
+                default:
+                    System.err.println("Tu executeSubroutineByName Ridi");
         }
     }
 

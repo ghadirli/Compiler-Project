@@ -32,17 +32,13 @@ PROGRAM
 |   |   |   |   |   |   |   |   |   |   EXPRESSION3
 |   |   |   |   |   |   |   |   |   |   |   =
 |   |   |   |   |   |   |   |   |   |   |   EXPRESSION
-|   |   |   |   |   |   |   |   |   |   |   |   a
-|   |   |   |   |   |   |   |   |   |   |   |   EXPRESSION2
-|   |   |   |   |   |   |   |   |   |   |   |   |   VAR2
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
-|   |   |   |   |   |   |   |   |   |   |   |   |   EXPRESSION3
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   TERM2
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   ADDITIVEEXPRESSION2
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   SIMPLEEXPRESSION2
-|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   4
+|   |   |   |   |   |   |   |   |   |   |   |   TERM2
+|   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   ADDITIVEEXPRESSION2
+|   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
+|   |   |   |   |   |   |   |   |   |   |   |   SIMPLEEXPRESSION2
+|   |   |   |   |   |   |   |   |   |   |   |   |   epsilon
 |   |   |   |   |   |   |   |   ;
 |   |   |   |   |   |   STATEMENTLIST
 |   |   |   |   |   |   |   STATEMENT
