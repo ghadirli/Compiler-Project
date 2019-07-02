@@ -113,6 +113,9 @@ public class Subroutines {
             case "#sum_or_minus":
                 sum_or_minus();
                 break;
+            case "#lt_or_equal":
+                lt_or_equal();
+                break;
         }
     }
 
@@ -316,7 +319,7 @@ public class Subroutines {
         System.out.println("salaam");
         programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + ssFromLast(1) + ", )");
         incrementPBLine();
-        popss(2);
+        popss(1);
     }
 
     // not used yet
@@ -331,7 +334,7 @@ public class Subroutines {
         incrementPBLine();
     }
 
-    private void mult(){
+    private void mult() {
         int t = getTempMemory();
         programBlock.set(pbLineNumber, "(MULT, " + ssFromLast(0) + ", " + ssFromLast(1) + ", " + t + ")");
         incrementPBLine();
@@ -339,17 +342,17 @@ public class Subroutines {
         pushss(t);
     }
 
-    private void push0(){
+    private void push0() {
         pushss(0);
     }
 
-    private void push1(){
+    private void push1() {
         pushss(1);
     }
 
-    private void sum_or_minus(){
+    private void sum_or_minus() {
         int t = getTempMemory();
-        if(ssFromLast(1) == 0){
+        if (ssFromLast(1) == 0) {
             programBlock.set(pbLineNumber, "ADD, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
         } else {
             programBlock.set(pbLineNumber, "SUB, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
@@ -357,6 +360,18 @@ public class Subroutines {
         popss(3);
         pushss(t);
         incrementPBLine();
+    }
+
+    private void lt_or_equal() {
+        int t = getTempMemory();
+        if (ssFromLast(1) == 0)
+            programBlock.set(pbLineNumber, "(LT, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+        else
+            programBlock.set(pbLineNumber, "(EQ, " + ssFromLast(2) + ", " + ssFromLast(0) + ", " + t + ")");
+        popss(3);
+        pushss(t);
+        incrementPBLine();
+
     }
 
     //------------------------getter setter------------------------------
