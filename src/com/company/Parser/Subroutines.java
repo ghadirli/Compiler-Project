@@ -317,9 +317,9 @@ public class Subroutines {
         if (!nameStack.get(nameStack.size() - 1).equals("main")) {
             save();
         }
-        if (!currentFunction.equals("")) {
-            System.out.println("fuck you! this inner function wasn't meant to be here!");
-        }
+//        if (!currentFunction.equals("")) {
+//            System.out.println("this inner function wasn't meant to be here!");
+//        }
         currentFunction = currentFunction + "." + nameStack.get(nameStack.size() - 1);
         functionDeclaration.put(currentFunction, pbLineNumber);
         nameStack.remove(nameStack.size() - 1);
@@ -327,6 +327,10 @@ public class Subroutines {
 
     private void func_jump() {
         if (!currentFunction.equals(".main")) {
+            System.out.println(semanticStack.size());
+            for(int val : semanticStack){
+                System.out.println(val);
+            }
             programBlock.set(ssFromLast(0), "(JP, " + pbLineNumber + ", , )");
             popss(1);
         }
@@ -478,8 +482,9 @@ public class Subroutines {
     }
 
     private void return0(){
-        programBlock.set(pbLineNumber, "(JP, " + dollar_ra + ", , )");
+        programBlock.set(pbLineNumber, "(JP, @" + dollar_ra + ", , )");
         incrementPBLine();
+        // popss(1);
     }
 
     // TODO first and last one

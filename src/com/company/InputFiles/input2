@@ -1,13 +1,14 @@
-int f(int a, int b){
+int f(int b){
     int c;
-    a = 2;
+    //a = 2;
     c = 4;
-    return a + b + c;
+    //return a + b + c;
+    return b + c;
 }
 
 void main(void){
     int a;
     a = 4;
     a = a + a;
-    f(a, a);
+    f(a);
 }
