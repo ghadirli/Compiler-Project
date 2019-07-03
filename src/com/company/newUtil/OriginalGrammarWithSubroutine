@@ -7,16 +7,16 @@ DECLARATION2 -> VARDECLARATION2
 DECLARATION2 -> #func_addr_in_mem_save ( PARAMS ) COMPOUNDSTMT #func_jump
 VARDECLARATION2 -> #variable_declare_addr ;
 VARDECLARATION2 -> [ #array_declare_addr num ] ;
-PARAMS -> int id PARAM2 PARAMLIST2
+PARAMS -> int #push_name id PARAM2 PARAMLIST2
 PARAMS -> void PARAMS2
-PARAMS2 -> id PARAM2 PARAMLIST2
+PARAMS2 -> #void_error #push_name id PARAM2 PARAMLIST2
 PARAMS2 -> epsilon
 PARAMLIST2 -> , PARAMLIST3
 PARAMLIST2 -> epsilon
-PARAMLIST3 -> int id PARAM2 PARAMLIST2
-PARAMLIST3 -> void id PARAM2 PARAMLIST2
-PARAM2 -> [ ]
-PARAM2 -> epsilon
+PARAMLIST3 -> int #push_name id PARAM2 PARAMLIST2
+PARAMLIST3 -> #void_error void id PARAM2 PARAMLIST2
+PARAM2 -> [ #array_declare_addr_without_num ]
+PARAM2 -> epsilon #variable_declare_addr_add_to_hashmap
 COMPOUNDSTMT -> { DECLARATIONLIST STATEMENTLIST }
 STATEMENTLIST -> STATEMENT STATEMENTLIST
 STATEMENTLIST -> epsilon
@@ -72,6 +72,6 @@ FACTOR2 -> VAR2
 FACTOR2 -> ( ARGS )
 ARGS -> ARGLIST
 ARGS -> epsilon
-ARGLIST -> EXPRESSION ARGLIST2
-ARGLIST2 -> , EXPRESSION ARGLIST2
-ARGLIST2 -> epsilon
+ARGLIST -> EXPRESSION #assign_param ARGLIST2
+ARGLIST2 -> , EXPRESSION #assign_param ARGLIST2
+ARGLIST2 -> epsilon #final_assign_param

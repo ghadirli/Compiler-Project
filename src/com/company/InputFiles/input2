@@ -1,5 +1,13 @@
+int f(int a, int b){
+    int c;
+    a = 2;
+    c = 4;
+    return a + b + c;
+}
+
 void main(void){
     int a;
     a = 4;
     a = a + a;
+    a = f(a, a);
 }

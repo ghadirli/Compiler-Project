@@ -23,7 +23,7 @@ public class Main {
 //            System.out.println(curToken.getLineNumber() + ": " + curToken.getTokenType() + ", " + curToken.getDescription());
 //        } while (curToken.getTokenType() != TokenTypes.EOF);
 
-        Lexer lexer = new Lexer(sampleInputDirectory + "/input1", sampleOutputDirectory + "/scanner.txt", sampleOutputDirectory + "/lexical_errors.txt");
+        Lexer lexer = new Lexer(sampleInputDirectory + "/input2", sampleOutputDirectory + "/scanner.txt", sampleOutputDirectory + "/lexical_errors.txt");
         Parser parser = new Parser(lexer, sampleOutputDirectory + "/parser_output.txt", sampleOutputDirectory + "/parser_errors.txt");
         parser.parse();
 

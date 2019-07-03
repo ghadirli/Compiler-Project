@@ -1,13 +1,14 @@
 void main(void){
     int a;
     int b;
-    b = 5
-    a = 2
+    b = 5;
+    a = 2;
 
-    while(a < 4){
+    while(a < 13){
         while(a < 10){
             a = a + 1;
         }
-        b = b + 1
+        a = a + 1;
+        b = b + 1;
     }
 }

@@ -16,6 +16,7 @@ public class Subroutines {
     private int pbLineNumber;
     private final int startOfTempMemoryAddress = 1000;
     private final int dataSectionStart = 500;
+    private final int MAXARRAYSIZE = (startOfTempMemoryAddress - dataSectionStart) / 10;
     private int lastDataPointer = dataSectionStart;
     private int lastTempMemory = startOfTempMemoryAddress;
     private ArrayList<String> programBlock = new ArrayList<>();
@@ -23,7 +24,9 @@ public class Subroutines {
     private ArrayList<ArrayList<Integer>> continuableLines = new ArrayList<>();
     private HashMap<String, Integer> variableDeclarations = new HashMap<>(); // variables place in memory
     private HashMap<String, Integer> functionDeclaration = new HashMap<>(); // functions start line in program block
-    private HashMap<String, String> typeOfVariablesAndFunctions = new HashMap<>(); // int void int[] (or int_10) ...
+    private HashMap<String, String> typeOfVariablesAndFunctions = new HashMap<>(); // int void int[] (or int_10) ... function -> int.int_int_int[]
+    private HashMap<String, ArrayList<String>> argumentsOfFunction = new HashMap<>();
+    private ArrayList<Integer> tempForParams = new ArrayList<>();
     private ArrayList<String> nameStack = new ArrayList<>();
     private boolean isFirstCase = true;
     private final int returnValuesAddress = startOfTempMemoryAddress - 4;
@@ -57,7 +60,7 @@ public class Subroutines {
                 try {
                     break0();
                 } catch (Exception e) {
-                    // TODO inappropriate break in middle of code
+                    System.out.println("no while or switch found for break.");
                 }
                 break;
             case "#new_breakable":
@@ -127,19 +130,34 @@ public class Subroutines {
                 jpf_save_case_and_push_num(nextToken);
                 break;
             case "#continue":
-                continue0();
+                try {
+                    continue0();
+                } catch (Exception e){
+                    System.out.println("no while found for continue.");
+                }
                 break;
             case "#default":
                 default0();
+                break;
+            case "#void_error":
+                void_error();
+                break;
+            case "#variable_declare_addr_add_to_hashmap":
+                variable_declare_addr_add_to_hashmap();
+                break;
+            case "#array_declare_addr_without_num":
+                array_declare_addr_without_num();
+                break;
+            case "#final_assign_param":
+                final_assign_param();
+                break;
+            case "#assign_param":
+                assign_param();
                 break;
             default:
                 System.err.println(subroutineName);
                 System.err.println("Tu executeSubroutineByName Ridi");
         }
-    }
-
-    private void save_in_memory() {
-
     }
 
     private void popss(int numberToPop) {
@@ -288,23 +306,24 @@ public class Subroutines {
 
     // TODO overloading
     private void func_addr_in_mem_save() {
+        argumentsOfFunction.put(nameStack.get(nameStack.size()-1), new ArrayList<>());
         if (!nameStack.get(nameStack.size() - 1).equals("main")) {
             save();
         }
         if (!currentFunction.equals("")) {
             System.out.println("fuck you! this inner function wasn't meant to be here!");
         }
-        currentFunction = nameStack.get(nameStack.size() - 1);
-        functionDeclaration.put(nameStack.get(nameStack.size() - 1), pbLineNumber);
+        currentFunction = currentFunction + "." + nameStack.get(nameStack.size() - 1);
+        functionDeclaration.put(currentFunction, pbLineNumber);
         nameStack.remove(nameStack.size() - 1);
     }
 
     private void func_jump() {
-        if (!currentFunction.equals("main")) {
+        if (!currentFunction.equals(".main")) {
             programBlock.set(ssFromLast(0), "(JP, " + pbLineNumber + ", , )");
             popss(1);
         }
-        currentFunction = "";
+        currentFunction = currentFunction.substring(0, currentFunction.lastIndexOf("."));
     }
 
     private void variable_declare_addr() {
@@ -313,9 +332,26 @@ public class Subroutines {
         nameStack.remove(nameStack.size() - 1);
     }
 
+    private void variable_declare_addr_add_to_hashmap() {
+        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size() - 1), lastDataPointer);
+        if(argumentsOfFunction.get(currentFunction) == null){
+            argumentsOfFunction.put(currentFunction, new ArrayList<>());
+        }
+        argumentsOfFunction.get(currentFunction).add(nameStack.get(nameStack.size()-1));
+        lastDataPointer += 4;
+        nameStack.remove(nameStack.size() - 1);
+    }
+
     private void array_declare_addr(Token nextToken) {
         variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size() - 1) + "[" + nextToken.getDescription() + "]", lastDataPointer);
         lastDataPointer += 4 * Integer.parseInt(nextToken.getDescription());
+        nameStack.remove(nameStack.size() - 1);
+    }
+
+    private void array_declare_addr_without_num() {
+        variableDeclarations.put(currentFunction + "." + nameStack.get(nameStack.size() - 1) + "[" + MAXARRAYSIZE + "]", lastDataPointer);
+        argumentsOfFunction.get(currentFunction).add(nameStack.get(nameStack.size()-1) + "[" + MAXARRAYSIZE + "]");
+        lastDataPointer += 4 * MAXARRAYSIZE;
         nameStack.remove(nameStack.size() - 1);
     }
 
@@ -358,7 +394,6 @@ public class Subroutines {
     }
 
     private void assign() {
-//        System.out.println("salaam");
         programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + ssFromLast(1) + ", )");
         incrementPBLine();
         popss(1);
@@ -446,6 +481,42 @@ public class Subroutines {
         }
 
         pushss(t1);
+    }
+
+    private void void_error(){
+        System.out.println("Illegal type of void.");
+    }
+
+    private void assign_param(){
+        tempForParams.add(ssFromLast(0));
+        //variableDeclarations.get(argumentsOfFunction.get(funcName))
+        popss(1);
+    }
+
+    private void final_assign_param(){
+        String funcName = findFunctionNameByAddress(ssFromLast(0));
+        int ind = 0;
+        if(tempForParams.size() != argumentsOfFunction.get(funcName).size()){
+            System.out.println("Mismatch in number of arguments of " + funcName);
+        }
+        for(String variableName : argumentsOfFunction.get(funcName)){
+            programBlock.set(pbLineNumber, "(ASSIGN, " + tempForParams.get(ind) + ", " + variableDeclarations.get(variableName) + ", )");
+            incrementPBLine();
+            ind++;
+        }
+        tempForParams = new ArrayList<>();
+        popss(1);
+    }
+
+    //------------------------other functions---------------------------
+
+    private String findFunctionNameByAddress(int addr){
+        for(String name : functionDeclaration.keySet()){
+            if(functionDeclaration.get(name) == addr){
+                return name;
+            }
+        }
+        return null;
     }
 
     //------------------------getter setter------------------------------
