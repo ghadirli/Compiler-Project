@@ -379,8 +379,8 @@ public class Subroutines {
                 String globalArrayName = checkArrayInHashMap("." + nextToken.getDescription(), variableDeclarations);
                 if (globalArrayName != null) {
                     pushss(variableDeclarations.get(globalArrayName));
-                } else if (functionDeclaration.containsKey(nextToken.getDescription())) {
-                    pushss(functionDeclaration.get(nextToken.getDescription()));
+                } else if (functionDeclaration.containsKey("." + nextToken.getDescription())) {
+                    pushss(functionDeclaration.get("." + nextToken.getDescription()));
                 } else {
                     System.out.println(nextToken.getDescription() + " is not defined.");
                 }
