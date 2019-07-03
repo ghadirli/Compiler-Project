@@ -29,8 +29,9 @@ public class Subroutines {
     private ArrayList<Integer> tempForParams = new ArrayList<>();
     private ArrayList<String> nameStack = new ArrayList<>();
     private boolean isFirstCase = true;
-    private final int returnValuesAddress = startOfTempMemoryAddress - 4;
+    private final int dollar_ra = startOfTempMemoryAddress - 4;
     private String currentFunction = "";
+    private ArrayList<Integer> returnAdresses = new ArrayList<>();
 
     // TODO overloading functions ( f_int_int[10] ) and global local variables (f.a)
 
@@ -153,6 +154,12 @@ public class Subroutines {
                 break;
             case "#assign_param":
                 assign_param();
+                break;
+            case "#fix_dollar_ra":
+                fix_dollar_ra();
+                break;
+            case "#return":
+                return0();
                 break;
             default:
                 System.err.println(subroutineName);
@@ -452,8 +459,26 @@ public class Subroutines {
 
     // TODO jump after return
     private void return_value() {
-        programBlock.set(pbLineNumber, "(ASSIGN, " + ssFromLast(0) + ", " + returnValuesAddress + ", )");
+//        programBlock.set(pbLineNumber, "(ASSIGN, " + returnAdresses.get(returnAdresses.size()-1) + ", " + dollar_ra + ", )");
+//        popss(1);
+//        incrementPBLine();
+
+    }
+
+    private void fix_dollar_ra(){
+        returnAdresses.add(dollar_ra);
+        programBlock.set(pbLineNumber, "(ASSIGN, " + (pbLineNumber+2) + ", " + dollar_ra + ", )");
+        incrementPBLine();
+        programBlock.set(pbLineNumber, "(JP, " + ssFromLast(0) + ", , )");
+        incrementPBLine();
+        programBlock.set(pbLineNumber, "(ASSIGN, " + returnAdresses.get(returnAdresses.size()-1) + ", " + dollar_ra + ", )");
+        incrementPBLine();
+        returnAdresses.remove(returnAdresses.size()-1);
         popss(1);
+    }
+
+    private void return0(){
+        programBlock.set(pbLineNumber, "(JP, " + dollar_ra + ", , )");
         incrementPBLine();
     }
 
